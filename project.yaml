@@ -1,0 +1,20 @@
+# SAYN sample project. Follow the tutorial for more details:
+# https://173tech.github.io/sayn/tutorials/tutorial_part1
+
+parameters:
+  user_prefix: ""
+
+  schema:
+    logs: analytics_logs
+    staging: analytics_staging
+    models: analytics_models
+
+  from_prod:
+
+required_credentials:
+  # List of credential names used by tasks in the project
+  - warehouse
+  - postgres_ethereum
+
+# Credential used by sql and autosql tasks
+default_db: warehouse

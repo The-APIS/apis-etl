@@ -1,0 +1,103 @@
+tasks:
+
+  extract_ethereum_methods:
+    type: copy
+    source:
+      db: postgres_ethereum
+      schema: public
+      table: EthereumMethod
+    destination:
+      schema: analytics_logs
+      table: ethereum_methods
+    incremental_key: id
+    delete_key: id
+    max_merge_rows: 1000000
+    ddl:
+      columns:
+        - id
+        - contract
+        - "method"
+        - name: params
+          type: variant
+        - "txHash"
+        - "createdAt"
+        - "updatedAt"
+
+  extract_ethereum_transactions:
+    type: copy
+    source:
+      db: postgres_ethereum
+      schema: public
+      table: EthereumTx
+    destination:
+      schema: analytics_logs
+      table: ethereum_transactions
+    incremental_key: id
+    delete_key: id
+    max_merge_rows: 1000000
+    ddl:
+      columns:
+        - id
+        - name: "from"
+          dst_name: "from_address"
+        - name: "to"
+          dst_name: "to_address"
+        - "transactionIndex"
+        - "gasPrice"
+        - gas
+        - "blockNumber"
+        - hash
+        - v
+        - s
+        - r
+        - "contractAddress"
+        - "cumulativeGasUsed"
+        - "gasUsed"
+        - logs
+        - "logsBloom"
+        - status
+        - value
+        - nonce
+        - "input"
+        - "balanceTo"
+        - "balanceFrom"
+        - "blockHash"
+        - "createdAt"
+        - "updatedAt"
+
+  extract_ethereum_blocks:
+    type: copy
+    source:
+      db: postgres_ethereum
+      schema: public
+      table: EthereumBlock
+    destination:
+      schema: analytics_logs
+      table: ethereum_blocks
+    incremental_key: id
+    delete_key: id
+    max_merge_rows: 1000000
+    ddl:
+      columns:
+        - id
+        - difficulty
+        - "extraData"
+        - "gasLimit"
+        - "blockGasUsed"
+        - hash
+        - "logsBloom"
+        - miner
+        - "mixHash"
+        - nonce
+        - "number"
+        - "parentHash"
+        - "receiptsRoot"
+        - "sha3Uncles"
+        - "stateRoot"
+        - "timestamp"
+        - "totalDifficulty"
+        - "transactionsRoot"
+        - name: uncles
+          type: variant
+        - "createdAt"
+        - "updatedAt"
