@@ -1,0 +1,7 @@
+tasks:
+
+  stg_block:
+    preset: staging
+
+  dim_test:
+    preset: models

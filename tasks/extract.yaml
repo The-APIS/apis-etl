@@ -1,17 +1,9 @@
 tasks:
 
   extract_ethereum_methods:
-    type: copy
+    preset: extract_postgres
     source:
-      db: postgres_ethereum
-      schema: public
       table: EthereumMethod
-    destination:
-      schema: analytics_logs
-      table: ethereum_methods
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
     ddl:
       columns:
         - id
@@ -24,17 +16,9 @@ tasks:
         - "updatedAt"
 
   extract_ethereum_transactions:
-    type: copy
+    preset: extract_postgres
     source:
-      db: postgres_ethereum
-      schema: public
       table: EthereumTx
-    destination:
-      schema: analytics_logs
-      table: ethereum_transactions
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
     ddl:
       columns:
         - id
@@ -66,17 +50,9 @@ tasks:
         - "updatedAt"
 
   extract_ethereum_blocks:
-    type: copy
+    preset: extract_postgres
     source:
-      db: postgres_ethereum
-      schema: public
       table: EthereumBlock
-    destination:
-      schema: analytics_logs
-      table: ethereum_blocks
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
     ddl:
       columns:
         - id
@@ -101,3 +77,20 @@ tasks:
           type: variant
         - "createdAt"
         - "updatedAt"
+        - size
+
+  extract_ethereum_contracts:
+    preset: extract_postgres
+    source:
+      table: EthereumContract
+    ddl:
+      columns:
+        - id
+        - slug
+        - address
+        - type
+        - network
+        - name: metadata
+          type: variant
+        - createdAt
+        - updatedAt
