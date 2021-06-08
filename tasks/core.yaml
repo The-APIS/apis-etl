@@ -3,5 +3,31 @@ tasks:
   stg_block:
     preset: staging
 
-  dim_test:
+  stg_ethereum_token_transfers_cast:
+    preset: staging
+
+  stg_ethereum_token_transfer_in:
+    preset: staging
+    parents:
+      - stg_ethereum_token_transfers_cast
+
+  stg_ethereum_token_transfer_out:
+    preset: staging
+    parents:
+      - stg_ethereum_token_transfers_cast
+
+  f_ethereum_holders:
     preset: models
+    parents:
+      - stg_ethereum_token_transfer_in
+      - stg_ethereum_token_transfer_out
+
+  f_ethereum_token_summary:
+    preset: models
+    parents:
+      - f_ethereum_holders
+
+  f_token_analytics_chart:
+    preset: models
+    parents:
+      - stg_ethereum_token_transfers_cast

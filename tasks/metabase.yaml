@@ -1,0 +1,15 @@
+tasks:
+  mb_f_ethereum_holders:
+    preset: metabase
+    parents:
+      - f_ethereum_holders
+
+  mb_f_ethereum_token_summary:
+    preset: metabase
+    parents:
+      - f_ethereum_token_summary
+
+  mb_f_token_analytics_chart:
+    preset: metabase
+    parents:
+      - f_token_analytics_chart

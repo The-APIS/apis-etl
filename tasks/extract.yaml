@@ -1,4 +1,28 @@
 tasks:
+  extract_bq_ethereum_tokens:
+    preset: extract_bigquery
+    source:
+      table: tokens
+
+  extract_bq_ethereum_contracts:
+    preset: extract_bigquery
+    source:
+      table: contracts
+    max_merge_rows: 100000
+
+  extract_bq_ethereum_blocks:
+    preset: extract_bigquery
+    source:
+      table: blocks
+    delete_key: hash
+
+  extract_bq_ethereum_transactions:
+    preset: extract_bigquery
+    source:
+      table: transactions
+    delete_key: hash
+    max_merge_rows: 3500000
+    max_batch_rows: 200000
 
   extract_ethereum_methods:
     preset: extract_postgres
