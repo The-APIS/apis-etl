@@ -8,5 +8,8 @@ SELECT token_address
      , in_transactions
      , total_transactions
      , balance
+     , token_name
+     , holder_balance_perc
+     , ranking
 
 FROM {{ dynamic_src("models.f_ethereum_holders") }}

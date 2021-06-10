@@ -4,6 +4,7 @@ SELECT COALESCE(t.symbol, t.address) AS symbol
      , t.name
      , t.block_timestamp
      , t.address
+     , t.decimals
      , c.is_erc20
      , c.is_erc721
      , COUNT(DISTINCT h.holder_address) AS holders
@@ -20,6 +21,6 @@ LEFT JOIN {{ dynamic_src("logs.bq_ethereum_contracts") }} c
 
 WHERE h.balance > 0
 
-GROUP BY 1,2,3,4,5,6
+GROUP BY 1,2,3,4,5,6,7
 
 ORDER BY 7 DESC

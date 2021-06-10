@@ -9,5 +9,6 @@ SELECT symbol
      , holders
      , holder_value
      , total_transactions
+     , decimals
 
 FROM {{ dynamic_src("models.f_ethereum_token_summary") }}
