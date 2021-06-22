@@ -10,5 +10,6 @@ SELECT symbol
      , holder_value
      , total_transactions
      , decimals
+     , etherscan_ranking
 
 FROM {{ dynamic_src("models.f_ethereum_token_summary") }}

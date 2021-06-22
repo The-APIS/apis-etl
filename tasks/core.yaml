@@ -3,6 +3,9 @@ tasks:
   stg_block:
     preset: staging
 
+  stg_dates:
+    preset: staging
+
   stg_ethereum_token_transfers_cast:
     preset: staging
 
@@ -12,6 +15,11 @@ tasks:
       - stg_ethereum_token_transfers_cast
 
   stg_ethereum_token_transfer_out:
+    preset: staging
+    parents:
+      - stg_ethereum_token_transfers_cast
+
+  stg_daily_token_holder_balance:
     preset: staging
     parents:
       - stg_ethereum_token_transfers_cast
@@ -31,3 +39,13 @@ tasks:
     preset: models
     parents:
       - stg_ethereum_token_transfers_cast
+
+  f_daily_token_holder_balance:
+    preset: models
+    parents:
+      - stg_daily_token_holder_balance
+
+  f_daily_holders:
+    preset: models
+    parents:
+      - f_daily_token_holder_balance

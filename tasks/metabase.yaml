@@ -13,3 +13,11 @@ tasks:
     preset: metabase
     parents:
       - f_token_analytics_chart
+
+  mb_f_daily_holders:
+    preset: metabase
+    parents:
+      - f_daily_holders
+
+  mb_top_100_tokens:
+    preset: metabase
