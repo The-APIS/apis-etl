@@ -1,11 +1,4 @@
 tasks:
-  get_token_summary_gcp:
-    type: python
-    class: google_storage.getData
-    parameters:
-      bucket: bigquery_copy_c17e1206
-      object: "EthereumTokenSummary/"
-      path: "/Users/tim/gcp_f_ethereum_token_summary/data.csv.gz"
 
   get_token_summary:
     type: python
