@@ -49,3 +49,6 @@ tasks:
     preset: models
     parents:
       - f_daily_token_holder_balance
+
+  f_ethereum_blocks:
+    preset: models

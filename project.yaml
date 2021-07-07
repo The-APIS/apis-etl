@@ -11,7 +11,7 @@ parameters:
 
 required_credentials:
   - warehouse
-  # - postgres_ethereum
+  - postgres_ethereum
   - bigquery
   - postgres
 
@@ -42,6 +42,21 @@ presets:
       table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
     incremental_key: block_timestamp
     delete_key: address
+    max_merge_rows: 1000000
+
+  # Source Table and ddl required
+  extract_snowflake:
+    type: copy
+    source:
+      db: warehouse
+      schema: analytics_models
+      table: f_ethereum_blocks
+    destination:
+      db: postgres_ethereum
+      schema: public
+      table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
+    incremental_key: timestamp
+    delete_key: hash
     max_merge_rows: 1000000
 
   staging:

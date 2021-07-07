@@ -21,3 +21,9 @@ tasks:
 
   mb_top_100_tokens:
     preset: metabase
+
+  mb_top_500_tokens_erc20:
+    preset: metabase
+
+  mb_top_500_tokens_erc721:
+    preset: metabase

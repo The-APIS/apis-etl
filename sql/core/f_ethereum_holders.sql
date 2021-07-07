@@ -1,25 +1,31 @@
 {%- from 'sql/macros/dynamic_source.sql' import dynamic_src  -%}
 
 WITH holder_ledger AS (
-  SELECT token_address
-       , holder_address
-       , out_value
-       , out_transactions
+  SELECT h.token_address
+       , h.holder_address
+       , CASE WHEN c.is_erc721 THEN 1 ELSE h.out_value END AS out_value
+       , h.out_transactions
        , 0 AS in_value
        , 0 AS in_transactions
-       , - out_value AS value
-  FROM {{ dynamic_src("staging.stg_ethereum_token_transfer_out") }}
+       , CASE WHEN c.is_erc721 THEN -1 ELSE -h.out_value END AS value
+  FROM {{ dynamic_src("staging.stg_ethereum_token_transfer_out") }} h
+
+  LEFT JOIN {{ dynamic_src("logs.bq_ethereum_contracts") }} c
+    ON h.token_address = c.address
 
   UNION ALL
 
-  SELECT token_address
-       , holder_address
+  SELECT h.token_address
+       , h.holder_address
        , 0 AS out_value
        , 0 AS out_transactions
-       , in_value
-       , in_transactions
-       , in_value AS value
-  FROM {{ dynamic_src("staging.stg_ethereum_token_transfer_in") }}
+       , CASE WHEN c.is_erc721 THEN 1 ELSE h.in_value END AS in_value
+       , h.in_transactions
+       , CASE WHEN c.is_erc721 THEN 1 ELSE h.in_value END AS value
+  FROM {{ dynamic_src("staging.stg_ethereum_token_transfer_in") }} h
+
+  LEFT JOIN {{ dynamic_src("logs.bq_ethereum_contracts") }} c
+    ON h.token_address = c.address
 )
 
 , pre_final AS (

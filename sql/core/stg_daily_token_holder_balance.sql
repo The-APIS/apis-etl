@@ -1,33 +1,42 @@
 {%- from 'sql/macros/dynamic_source.sql' import dynamic_src  -%}
 
-WITH transfer_out AS (
- SELECT token_address
-      , from_address AS holder_address
-      , TO_DATE(block_timestamp) AS dt
-      , SUM(VALUE_DOUBLE) AS out_value
+WITH tokens AS (
+  SELECT address
+       , 0 AS is_erc721
+  FROM {{ dynamic_src("logs.top_500_tokens_erc20") }}
 
- FROM {{ dynamic_src("staging.stg_ethereum_token_transfers_cast") }}
+  UNION ALL
 
- WHERE token_address IN (
-   SELECT address
-   FROM {{ dynamic_src("models.top_100_tokens") }}
- )
+  SELECT address
+       , 1 AS is_erc721
+  FROM {{ dynamic_src("logs.top_500_tokens_erc721") }}
+
+)
+
+, transfer_out AS (
+ SELECT c.token_address
+      , c.from_address AS holder_address
+      , TO_DATE(c.block_timestamp) AS dt
+      , SUM(CASE WHEN t.is_erc721 = 1 THEN 1 ELSE c.value_double END) AS out_value
+
+ FROM {{ dynamic_src("staging.stg_ethereum_token_transfers_cast") }} c
+
+ INNER JOIN tokens t
+  ON c.token_address = t.address
 
  GROUP BY 1,2,3
 )
 
 , transfer_in AS (
- SELECT token_address
-      , to_address AS holder_address
-      , TO_DATE(block_timestamp) AS dt
-      , SUM(VALUE_DOUBLE) AS in_value
+ SELECT c.token_address
+      , c.to_address AS holder_address
+      , TO_DATE(c.block_timestamp) AS dt
+      , SUM(CASE WHEN t.is_erc721 = 1 THEN 1 ELSE c.value_double END) AS in_value
 
- FROM {{ dynamic_src("staging.stg_ethereum_token_transfers_cast") }}
+ FROM {{ dynamic_src("staging.stg_ethereum_token_transfers_cast") }} c
 
- WHERE token_address IN (
-   SELECT address
-   FROM {{ dynamic_src("models.top_100_tokens") }}
- )
+ INNER JOIN tokens t
+  ON c.token_address = t.address
 
  GROUP BY 1,2,3
 )

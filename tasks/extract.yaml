@@ -1,4 +1,32 @@
 tasks:
+  get_token_summary_gcp:
+    type: python
+    class: google_storage.getData
+    parameters:
+      bucket: bigquery_copy_c17e1206
+      object: "EthereumTokenSummary/"
+      path: "/Users/tim/gcp_f_ethereum_token_summary/data.csv.gz"
+
+  get_token_summary:
+    type: python
+    class: get_data.getData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_token_summary
+      path: "Users/tim/f_ethereum_token_summary"
+
+  get_holders:
+    type: python
+    class: get_data.getData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_holders
+      path: "Users/tim/f_ethereum_holders"
+
   extract_bq_ethereum_tokens:
     preset: extract_bigquery
     source:
@@ -118,3 +146,6 @@ tasks:
           type: variant
         - createdAt
         - updatedAt
+
+  extract_bq_EthereumBlock:
+    preset: extract_snowflake
