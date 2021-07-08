@@ -6,4 +6,4 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD "sayn run -t get_token_summary"
+CMD scripts/get_data.sh
