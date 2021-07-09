@@ -9,7 +9,8 @@
 ### Variable Explanation
 `your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
 
-#### Credentials Structure
+#### Credentials Structure
+```
 {
   "type": "snowflake"
   "account": "part before snowflakecomputing in the snowflake url e.g. account = abc100 if url = https://abc100.snowflakecomputing.com/"
@@ -19,6 +20,7 @@
   "warehouse": "COMPUTE_WH"
   "role": "ETL"
 }
+```
 
 `path_to_save_to_1`: the local path you want to save the files for `f_ethereum_token_summary` e.g. local_path/f_ethereum_token_summary
 
