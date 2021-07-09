@@ -1,1 +1,6 @@
 sayn
+
+# DB Connectors
+psycopg2-binary==2.8.6
+snowflake-connector-python==2.4.3
+snowflake-sqlalchemy==1.2.4

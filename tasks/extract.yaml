@@ -1,103 +1,144 @@
 tasks:
 
-  extract_ethereum_methods:
-    type: copy
-    source:
-      db: postgres_ethereum
-      schema: public
-      table: EthereumMethod
-    destination:
-      schema: analytics_logs
-      table: ethereum_methods
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
-    ddl:
-      columns:
-        - id
-        - contract
-        - "method"
-        - name: params
-          type: variant
-        - "txHash"
-        - "createdAt"
-        - "updatedAt"
+  get_token_summary:
+    type: python
+    class: get_data.getData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_token_summary
+      path: 'Users/tim/f_ethereum_token_summary'
 
-  extract_ethereum_transactions:
-    type: copy
-    source:
-      db: postgres_ethereum
-      schema: public
-      table: EthereumTx
-    destination:
-      schema: analytics_logs
-      table: ethereum_transactions
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
-    ddl:
-      columns:
-        - id
-        - name: "from"
-          dst_name: "from_address"
-        - name: "to"
-          dst_name: "to_address"
-        - "transactionIndex"
-        - "gasPrice"
-        - gas
-        - "blockNumber"
-        - hash
-        - v
-        - s
-        - r
-        - "contractAddress"
-        - "cumulativeGasUsed"
-        - "gasUsed"
-        - logs
-        - "logsBloom"
-        - status
-        - value
-        - nonce
-        - "input"
-        - "balanceTo"
-        - "balanceFrom"
-        - "blockHash"
-        - "createdAt"
-        - "updatedAt"
+  get_holders:
+    type: python
+    class: get_data.getData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_holders
+      path: 'Users/tim/f_ethereum_holders'
 
-  extract_ethereum_blocks:
-    type: copy
-    source:
-      db: postgres_ethereum
-      schema: public
-      table: EthereumBlock
-    destination:
-      schema: analytics_logs
-      table: ethereum_blocks
-    incremental_key: id
-    delete_key: id
-    max_merge_rows: 1000000
-    ddl:
-      columns:
-        - id
-        - difficulty
-        - "extraData"
-        - "gasLimit"
-        - "blockGasUsed"
-        - hash
-        - "logsBloom"
-        - miner
-        - "mixHash"
-        - nonce
-        - "number"
-        - "parentHash"
-        - "receiptsRoot"
-        - "sha3Uncles"
-        - "stateRoot"
-        - "timestamp"
-        - "totalDifficulty"
-        - "transactionsRoot"
-        - name: uncles
-          type: variant
-        - "createdAt"
-        - "updatedAt"
+  # extract_bq_ethereum_tokens:
+  #   preset: extract_bigquery
+  #   source:
+  #     table: tokens
+  #
+  # extract_bq_ethereum_contracts:
+  #   preset: extract_bigquery
+  #   source:
+  #     table: contracts
+  #   max_merge_rows: 100000
+  #
+  # extract_bq_ethereum_blocks:
+  #   preset: extract_bigquery
+  #   source:
+  #     table: blocks
+  #   delete_key: hash
+  #
+  # extract_bq_ethereum_transactions:
+  #   preset: extract_bigquery
+  #   source:
+  #     table: transactions
+  #   delete_key: hash
+  #   max_merge_rows: 3500000
+  #   max_batch_rows: 200000
+
+  # extract_bq_EthereumBlock:
+  #   preset: extract_snowflake
+
+  # extract_ethereum_methods:
+  #   preset: extract_postgres
+  #   source:
+  #     table: EthereumMethod
+  #   ddl:
+  #     columns:
+  #       - id
+  #       - contract
+  #       - "method"
+  #       - name: params
+  #         type: variant
+  #       - "txHash"
+  #       - "createdAt"
+  #       - "updatedAt"
+  #
+  # extract_ethereum_transactions:
+  #   preset: extract_postgres
+  #   source:
+  #     table: EthereumTx
+  #   ddl:
+  #     columns:
+  #       - id
+  #       - name: "from"
+  #         dst_name: "from_address"
+  #       - name: "to"
+  #         dst_name: "to_address"
+  #       - "transactionIndex"
+  #       - "gasPrice"
+  #       - gas
+  #       - "blockNumber"
+  #       - hash
+  #       - v
+  #       - s
+  #       - r
+  #       - "contractAddress"
+  #       - "cumulativeGasUsed"
+  #       - "gasUsed"
+  #       - logs
+  #       - "logsBloom"
+  #       - status
+  #       - value
+  #       - nonce
+  #       - "input"
+  #       - "balanceTo"
+  #       - "balanceFrom"
+  #       - "blockHash"
+  #       - "createdAt"
+  #       - "updatedAt"
+  #
+  # extract_ethereum_blocks:
+  #   preset: extract_postgres
+  #   source:
+  #     table: EthereumBlock
+  #   ddl:
+  #     columns:
+  #       - id
+  #       - difficulty
+  #       - "extraData"
+  #       - "gasLimit"
+  #       - "blockGasUsed"
+  #       - hash
+  #       - "logsBloom"
+  #       - miner
+  #       - "mixHash"
+  #       - nonce
+  #       - "number"
+  #       - "parentHash"
+  #       - "receiptsRoot"
+  #       - "sha3Uncles"
+  #       - "stateRoot"
+  #       - "timestamp"
+  #       - "totalDifficulty"
+  #       - "transactionsRoot"
+  #       - name: uncles
+  #         type: variant
+  #       - "createdAt"
+  #       - "updatedAt"
+  #       - size
+  #
+  # extract_ethereum_contracts:
+  #   preset: extract_postgres
+  #   source:
+  #     table: EthereumContract
+  #   ddl:
+  #     columns:
+  #       - id
+  #       - slug
+  #       - address
+  #       - type
+  #       - network
+  #       - name: metadata
+  #         type: variant
+  #       - createdAt
+  #       - updatedAt

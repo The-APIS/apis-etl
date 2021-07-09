@@ -1,6 +1,3 @@
-# SAYN sample project. Follow the tutorial for more details:
-# https://173tech.github.io/sayn/tutorials/tutorial_part1
-
 parameters:
   user_prefix: ""
 
@@ -8,13 +5,94 @@ parameters:
     logs: analytics_logs
     staging: analytics_staging
     models: analytics_models
+    viz: analytics_viz
 
   from_prod:
 
 required_credentials:
-  # List of credential names used by tasks in the project
   - warehouse
-  - postgres_ethereum
+  # - postgres_ethereum
+  # - bigquery
+  # - postgres
 
-# Credential used by sql and autosql tasks
 default_db: warehouse
+
+presets:
+  # Source Table and ddl required
+  # extract_postgres:
+  #   type: copy
+  #   source:
+  #     db: postgres_ethereum
+  #     schema: public
+  #   destination:
+  #     schema: "{{ schema['logs'] }}"
+  #     table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
+  #   incremental_key: id
+  #   delete_key: id
+  #   max_merge_rows: 1000000
+
+  # Source Table and ddl required
+  # extract_bigquery:
+  #   type: copy
+  #   source:
+  #     db: bigquery
+  #     schema: bigquery-public-data.crypto_ethereum
+  #   destination:
+  #     schema: "{{ schema['logs'] }}"
+  #     table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
+  #   incremental_key: block_timestamp
+  #   delete_key: address
+  #   max_merge_rows: 1000000
+
+  # Source Table and ddl required
+  extract_snowflake:
+    type: copy
+    source:
+      db: warehouse
+      schema: analytics_models
+      table: f_ethereum_blocks
+    destination:
+      db: postgres_ethereum
+      schema: public
+      table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
+    incremental_key: timestamp
+    delete_key: hash
+    max_merge_rows: 1000000
+
+  staging:
+    type: autosql
+    materialisation: table
+    file_name: "{{ task.group }}/{{ task.name }}.sql"
+    destination:
+      tmp_schema: "{{ schema['staging'] }}"
+      schema: "{{ schema['staging'] }}"
+      table: "{{ user_prefix }}{{ task.name }}"
+    parameters:
+      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
+      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
+      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'
+
+  models:
+    type: autosql
+    materialisation: table
+    file_name: "{{ task.group }}/{{ task.name }}.sql"
+    destination:
+      tmp_schema: "{{ schema['staging'] }}"
+      schema: "{{ schema['models'] }}"
+      table: "{{ user_prefix }}{{ task.name }}"
+    parameters:
+      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
+      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
+      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'
+
+  metabase:
+    type: autosql
+    file_name: "{{ task.group }}/{{ task.name }}.sql"
+    materialisation: view
+    destination:
+      schema: "{{ schema['viz'] }}"
+      table: "{{ user_prefix }}{{ task.name[3:] }}"
+    parameters:
+      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
+      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
+      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'

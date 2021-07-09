@@ -1,0 +1,21 @@
+# SAYN
+images
+secrets
+settings.yaml
+compile
+local
+logs
+.env
+.ipynb_checkpoints
+
+venv
+Dockerfile
+README.md
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+.pytest_cache
+.dockerignore
+.gitignore
+.git
