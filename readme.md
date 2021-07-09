@@ -1,23 +1,71 @@
-This is an example SAYN project. It shows you how to implement and use SAYN for data processing and modelling.
+# Quick Start
 
-For more details, you can see the documentation here: https://173tech.github.io/sayn/
+## Retrieving Snowflake Data via Docker Container
 
-----
-Quick overview:
+1. Clone the repository and change directory to the clone repo
+2. Run `docker build . -t get_snowflake_data`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -v path_to_save_to_1:/Users/tim/f_ethereum_token_summary -v path_to_save_to_2:/Users/tim/f_ethereum_holders get_snowflake_data`
 
-SAYN uses 2 key files to control the project:
-  - settings.yaml: individual settings which are not shared
-  - project.yaml: project settings which are shared across all collaborators on the project
+### Variable Explanation
+`your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
 
-SAYN code is stored in 3 main folders:
-  - tasks: where the SAYN tasks are defined. Each YAML file in this folder represents a task group.
-  - sql: code for SQL tasks
-  - python: code for python tasks
+#### Credentials Structure
+{
+  "type": "snowflake"
+  "account": "part before snowflakecomputing in the snowflake url e.g. account = abc100 if url = https://abc100.snowflakecomputing.com/"
+  "user": "your username"
+  "password": "your password"
+  "database": "THEAPIS"
+  "warehouse": "COMPUTE_WH"
+  "role": "ETL"
+}
 
-SAYN uses some key commands for run:
-  - sayn run: run the whole project
-    - -p flag to specify a profile when running sayn: e.g. sayn run -p prod
-    - -t flag to specify tasks to run: e.g. sayn run -t task_name
-    - -t group:group_name to specify a task group to run: e.g. sayn run -t group:group_name
-  - sayn compile: compiles the code (similar flags apply)
-  - sayn --help for full detail on commands
+`path_to_save_to_1`: the local path you want to save the files for `f_ethereum_token_summary` e.g. local_path/f_ethereum_token_summary
+
+`path_to_save_to_2`: the local path you want to save the files for `f_ethereum_holders` e.g. local_path/f_ethereum_holders
+
+## Running Locally
+
+You will need to create a `settings.yaml` file, with the following structure:
+
+Example settings.yaml
+```
+default_profile: test
+
+profiles:
+  prod:
+    credentials:
+      warehouse: snowflake
+
+  test:
+    credentials:
+      warehouse: snowflake
+
+    parameters:
+      user_prefix: your_initials
+      schema:
+        logs: test_logs
+        staging: test_staging
+        models: test_models
+        viz: test_viz
+      from_prod:
+        - logs.ethereum_contracts
+        - logs.ethereum_transactions
+        - logs.ethereum_methods
+        - logs.ethereum_blocks
+        - logs.bq_ethereum_token_transfers
+        - logs.bq_ethereum_tokens
+        - logs.bq_ethereum_contracts
+        - staging.stg_ethereum_token_transfers_cast
+        - models.top_100_tokens
+
+credentials:
+  snowflake:
+    type: snowflake
+    account: "part before snowflakecomputing in the snowflake url e.g. account = abc100 if url = https://abc100.snowflakecomputing.com/"
+    user: "your username"
+    password: "your password"
+    database: THEAPIS
+    warehouse: COMPUTE_WH
+    role: ETL
+```
