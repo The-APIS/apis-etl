@@ -2,9 +2,9 @@
 
 ## Retrieving Snowflake Data via Docker Container
 
-1. Clone the repository and change directory to the clone repo
+1. Clone the repository and change directory to the cloned repo
 2. Run `docker build . -t get_snowflake_data`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -v path_to_save_to_1:/Users/tim/f_ethereum_token_summary -v path_to_save_to_2:/Users/tim/f_ethereum_holders get_snowflake_data`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -v path_to_save_to:/app/data_downloads get_snowflake_data`
 
 ### Variable Explanation
 `your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
@@ -21,10 +21,7 @@
   "role": "ETL"
 }
 ```
-
-`path_to_save_to_1`: the local path you want to save the files for `f_ethereum_token_summary` e.g. local_path/f_ethereum_token_summary
-
-`path_to_save_to_2`: the local path you want to save the files for `f_ethereum_holders` e.g. local_path/f_ethereum_holders
+`path_to_save_to` = local path to save the tables to
 
 ## Running Locally
 
