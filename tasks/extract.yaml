@@ -8,7 +8,7 @@ tasks:
       stage: data_unload
       schema: analytics_models
       table: f_ethereum_token_summary
-      path: 'Users/tim/f_ethereum_token_summary'
+      path: '/data_downloads/f_ethereum_token_summary'
 
   get_holders:
     type: python
@@ -18,7 +18,7 @@ tasks:
       stage: data_unload
       schema: analytics_models
       table: f_ethereum_holders
-      path: 'Users/tim/f_ethereum_holders'
+      path: '/data_downloads/f_ethereum_holders'
 
   # extract_bq_ethereum_tokens:
   #   preset: extract_bigquery

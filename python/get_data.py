@@ -1,4 +1,5 @@
 from sayn import PythonTask
+from os import getcwd, path, makedirs
 
 class getData(PythonTask):
 
@@ -8,7 +9,12 @@ class getData(PythonTask):
         stage = self.parameters["stage"]
         schema = self.parameters["schema"]
         table = self.parameters["table"]
-        path = self.parameters["path"]
+        full_path = getcwd() + self.parameters["path"]
+
+        if path.isdir(full_path):
+            pass
+        else:
+            makedirs(full_path)
 
 
         sql_query = f'''
@@ -30,7 +36,7 @@ class getData(PythonTask):
         COPY INTO @{stage}/{table}/
           from {table};
 
-        GET @{stage}/{table}/ file:///{path};
+        GET @{stage}/{table}/ file://{full_path};
 
         DROP STAGE {stage};
 
