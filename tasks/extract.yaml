@@ -20,10 +20,22 @@ tasks:
       table: f_ethereum_holders
       path: '/data_downloads/f_ethereum_holders'
 
+  test_etl:
+    type: python
+    class: ethereum_etl.loadData
+    parameters:
+      file_format: csv_loading
+      stage: data_load_test
+      schema: analytics_logs
+      table: transactions
+      start_block: 0
+      end_block: 9151904
+      blocks_per_file: 10000
+
   # extract_bq_ethereum_tokens:
   #   preset: extract_bigquery
   #   source:
-  #     table: tokens
+  #     table: tokens 6738652
   #
   # extract_bq_ethereum_contracts:
   #   preset: extract_bigquery
