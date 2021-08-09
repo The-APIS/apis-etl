@@ -27,19 +27,19 @@ class loadData(PythonTask):
 
             USE SCHEMA {schema};
 
-            CREATE OR REPLACE FILE FORMAT { file_format }
-                 TYPE = 'CSV'
-                 FIELD_DELIMITER = ','
-                 SKIP_HEADER = 1
-                 NULL_IF = ('0000-00-00 00:00:00')
-                 EMPTY_FIELD_AS_NULL = true
-                 FIELD_OPTIONALLY_ENCLOSED_BY = '"'
-                 ;
+            CREATE FILE FORMAT IF NOT EXISTS { file_format }
+                   TYPE = 'CSV'
+                   FIELD_DELIMITER = ','
+                   SKIP_HEADER = 1
+                   NULL_IF = ('0000-00-00 00:00:00')
+                   EMPTY_FIELD_AS_NULL = true
+                   FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+                   ;
 
-            CREATE OR REPLACE stage { stage }
-                 file_format = { file_format };
+            CREATE stage IF NOT EXISTS { stage }
+                   file_format = { file_format };
 
-            '''
+                '''
         print(f"Creating Stage: { stage }")
         self.default_db.execute(staging_query)
 
@@ -62,18 +62,34 @@ class loadData(PythonTask):
             relative_path = 'data_downloads/' + table + file_name
 
             print(f"Creating {file_name}")
-            subprocess.run(
-                [ "ethereumetl"
-                , "export_blocks_and_transactions"
-                , "--start-block"
-                , str(start_block)
-                , "--end-block"
-                , str(stop_block - 1)
-                , f"--{table}-output"
-                , relative_path
-                , "--provider-uri"
-                , "https://bsc-dataseed.binance.org"
-                ])
+
+            if table == "traces":
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "export_geth_traces"
+                    , "--start-block"
+                    , str(start_block)
+                    , "--end-block"
+                    , str(stop_block - 1)
+                    , "--output"
+                    , relative_path
+                    , "--provider-uri"
+                    , "https://bsc-dataseed.binance.org"
+                    ])
+            else:
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "export_blocks_and_transactions"
+                    , "--start-block"
+                    , str(start_block)
+                    , "--end-block"
+                    , str(stop_block - 1)
+                    , f"--{table}-output"
+                    , relative_path
+                    , "--provider-uri"
+                    , "https://bsc-dataseed.binance.org"
+                    ])
+
 
             print(f"Putting {file_name} into stage")
             self.default_db.execute(put_query)
@@ -88,7 +104,7 @@ class loadData(PythonTask):
         #
         #     copy_query = f'''
         #
-        #     CREATE OR REPLACE TABLE { full_table_name } (
+        #     CREATE IF NOT EXISTS TABLE { full_table_name } (
         #         number NUMBER,
         #         hash VARCHAR,
         #         parent_hash VARCHAR,
