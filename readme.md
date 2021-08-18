@@ -12,6 +12,7 @@
 2. Run `docker build . -t get_snowflake_data`
 3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -v path_to_save_to:/app/data_downloads get_snowflake_data sayn run -t group:data_dump`
 
+
 ### Variable Explanation
 `your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
 
