@@ -11,53 +11,10 @@ parameters:
 
 required_credentials:
   - warehouse
-  # - postgres_ethereum
-  # - bigquery
-  # - postgres
 
 default_db: warehouse
 
 presets:
-  # Source Table and ddl required
-  # extract_postgres:
-  #   type: copy
-  #   source:
-  #     db: postgres_ethereum
-  #     schema: public
-  #   destination:
-  #     schema: "{{ schema['logs'] }}"
-  #     table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
-  #   incremental_key: id
-  #   delete_key: id
-  #   max_merge_rows: 1000000
-
-  # Source Table and ddl required
-  # extract_bigquery:
-  #   type: copy
-  #   source:
-  #     db: bigquery
-  #     schema: bigquery-public-data.crypto_ethereum
-  #   destination:
-  #     schema: "{{ schema['logs'] }}"
-  #     table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
-  #   incremental_key: block_timestamp
-  #   delete_key: address
-  #   max_merge_rows: 1000000
-
-  # Source Table and ddl required
-  extract_snowflake:
-    type: copy
-    source:
-      db: warehouse
-      schema: analytics_models
-      table: f_ethereum_blocks
-    destination:
-      db: postgres_ethereum
-      schema: public
-      table: "{{ user_prefix }}{{ task.name['extract_'|length:] }}"
-    incremental_key: timestamp
-    delete_key: hash
-    max_merge_rows: 1000000
 
   staging:
     type: autosql
