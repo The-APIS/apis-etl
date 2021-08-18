@@ -1,83 +1,72 @@
 tasks:
 
-  get_token_summary:
+  bsc_incremental_load:
     type: python
-    class: get_data.getData
+    class: blockchain_data.loadData
     parameters:
       file_format: csv_unloading
-      stage: data_unload
-      schema: analytics_models
-      table: f_ethereum_token_summary
-      path: '/data_downloads/f_ethereum_token_summary'
-
-  get_holders:
-    type: python
-    class: get_data.getData
-    parameters:
-      file_format: csv_unloading
-      stage: data_unload
-      schema: analytics_models
-      table: f_ethereum_holders
-      path: '/data_downloads/f_ethereum_holders'
-
-  test_etl:
-    type: python
-    class: ethereum_etl.loadData
-    parameters:
-      file_format: csv_loading
-      stage: data_load_test
+      stage: bsc_stage
       schema: analytics_logs
-      table: transactions
-      start_block: 9151904
-      end_block: 9356457
+      blockchain: bsc
+      blockchain_url: 'https://bsc-dataseed.binance.org'
       blocks_per_file: 10000
-
-  extract_logs:
-    type: python
-    class: other_tables_extract
-    parameters:
-      file_format: csv_loading
-      stage: bsc_logs_load
-      schema: analytics_logs
-      table: logs
-
-  extract_traces:
-    type: python
-    class: ethereum_etl.loadData
-    parameters:
-      file_format: csv_loading
-      stage: traces_load
-      schema: analytics_logs
-      table: traces
-      start_block: 0
-      end_block: 9356457
-      blocks_per_file: 10000
-
-  extract_other_tables:
-    type: python
-    class: other_tables_extract.loadData
-    parameters:
-      file_format: csv_loading
-      schema: analytics_logs
-      stage: bsc_other_tables
-      start_block: 738
-      end_block: 938
       max_workers: 10
 
-  extract_test_tables:
-    type: python
-    class: other_tables_extract.loadData
-    parameters:
-      file_format: csv_loading
-      schema: analytics_logs
-      stage: load_test
-      start_block: 695
-      end_block: 696
-      max_workers: 12
-
   update_bsc_blocks:
-    type: python
-    class: bsc_data_load.loadData
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_blocks
+
+  update_bsc_transactions:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_transactions
+
+  update_bsc_token_transfers:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_token_transfers
+    parameters:
+      table: token_transfers
+
+  update_bsc_logs:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_logs
+
+  update_bsc_receipts:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_receipts
+
+  update_bsc_contracts:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_contracts
+
+  update_bsc_tokens:
+    preset: copy_from_stage
+    parents:
+      - bsc_incremental_load
+      - create_bsc_tokens
+
+  # extract_other_tables:
+  #   type: python
+  #   class: other_tables_extract.loadData
+  #   parameters:
+  #     file_format: csv_loading
+  #     schema: analytics_logs
+  #     stage: bsc_other_tables
+  #     start_block: 1
+  #     end_block: 2
+  #     max_workers: 10
+
   # extract_bq_ethereum_tokens:
   #   preset: extract_bigquery
   #   source:

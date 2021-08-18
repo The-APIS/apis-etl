@@ -1,0 +1,23 @@
+tasks:
+
+  create_bsc_blocks:
+    preset: create_table
+
+  create_bsc_transactions:
+    preset: create_table
+
+  create_bsc_logs:
+    preset: create_table
+
+  create_bsc_receipts:
+    preset: create_table
+
+  create_bsc_token_transfers:
+    preset: create_table
+    file_name: "create_tables/create_token_transfers.sql"
+
+  create_bsc_contracts:
+    preset: create_table
+
+  create_bsc_tokens:
+    preset: create_table

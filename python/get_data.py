@@ -44,5 +44,4 @@ class getData(PythonTask):
 
         self.default_db.execute(sql_query)
 
-        #"GET @analytics_models.unload_stage/f_ethereum_token_summary/ file:///Users/tim/get_test"
         return self.success()
