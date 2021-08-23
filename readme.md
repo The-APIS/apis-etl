@@ -4,7 +4,7 @@
 
 1. Clone the repository and change directory to the cloned repo
 2. Run `docker build . -t incremental_load`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_load sayn run -p prod -t group:extract`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_load sayn run -t group:extract`
 
 ## Retrieving Snowflake Data via Docker Container
 

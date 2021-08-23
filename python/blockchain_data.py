@@ -1,9 +1,10 @@
-from sayn import PythonTask
 from os import getcwd, makedirs, path, remove
 import subprocess
 
+from sayn import PythonTask
 
-class loadData(PythonTask):
+
+class LoadData(PythonTask):
 
     def run(self):
         file_format = self.parameters["file_format"]

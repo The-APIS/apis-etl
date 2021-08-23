@@ -1,7 +1,9 @@
-from sayn import PythonTask
-from os import getcwd, path, makedirs
+from os import getcwd, makedirs, path
 
-class getData(PythonTask):
+from sayn import PythonTask
+
+
+class GetData(PythonTask):
 
     def run(self):
 

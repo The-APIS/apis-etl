@@ -2,7 +2,7 @@ tasks:
 
   get_token_summary:
     type: python
-    class: get_data.getData
+    class: get_data.GetData
     parameters:
       file_format: csv_unloading
       stage: data_unload
@@ -12,7 +12,7 @@ tasks:
 
   get_holders:
     type: python
-    class: get_data.getData
+    class: get_data.GetData
     parameters:
       file_format: csv_unloading
       stage: data_unload

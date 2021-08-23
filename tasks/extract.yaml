@@ -2,7 +2,7 @@ tasks:
 
   bsc_incremental_load:
     type: python
-    class: blockchain_data.loadData
+    class: blockchain_data.LoadData
     parameters:
       file_format: csv_unloading
       stage: bsc_stage
