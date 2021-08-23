@@ -59,7 +59,7 @@ tasks:
   # extract_bq_ethereum_tokens:
   #   preset: extract_bigquery
   #   source:
-  #     table: tokens 6738652
+  #     table: tokens
   #
   # extract_bq_ethereum_contracts:
   #   preset: extract_bigquery
