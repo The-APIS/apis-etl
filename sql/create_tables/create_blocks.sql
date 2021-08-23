@@ -1,0 +1,22 @@
+USE SCHEMA {{ schema }};
+
+CREATE TABLE IF NOT EXISTS {{ table }} (
+    number NUMBER(38,0)
+  , hash VARCHAR(16777216)
+  , parent_hash	VARCHAR(16777216)
+  , nonce	VARCHAR(16777216)
+  , sha3_uncles	VARCHAR(16777216)
+  , logs_bloom VARCHAR(16777216)
+  , transactions_root	VARCHAR(16777216)
+  , state_root VARCHAR(16777216)
+  , receipts_root	VARCHAR(16777216)
+  , miner	VARCHAR(16777216)
+  , difficulty	NUMBER(38,0)
+  , total_difficulty	NUMBER(38,0)
+  , size NUMBER(38,0)
+  , extra_data	VARCHAR(16777216)
+  , gas_limit	NUMBER(38,0)
+  , gas_used NUMBER(38,0)
+  , timestamp	TIMESTAMP_NTZ(9)
+  , transaction_count	NUMBER(38,0)
+)

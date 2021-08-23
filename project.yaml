@@ -67,10 +67,6 @@ presets:
       tmp_schema: "{{ schema['staging'] }}"
       schema: "{{ schema['staging'] }}"
       table: "{{ user_prefix }}{{ task.name }}"
-    parameters:
-      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
-      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
-      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'
 
   models:
     type: autosql
@@ -80,10 +76,6 @@ presets:
       tmp_schema: "{{ schema['staging'] }}"
       schema: "{{ schema['models'] }}"
       table: "{{ user_prefix }}{{ task.name }}"
-    parameters:
-      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
-      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
-      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'
 
   metabase:
     type: autosql
@@ -92,7 +84,19 @@ presets:
     destination:
       schema: "{{ schema['viz'] }}"
       table: "{{ user_prefix }}{{ task.name[3:] }}"
+
+  create_table:
+    type: sql
+    file_name: "{{ task.group }}/{{ task.name.split('_')[0] }}_{{ task.name.split('_')[-1] }}.sql"
     parameters:
-      prefix_logs: '{{ schema["logs"] }}.{{ user_prefix }}'
-      prefix_staging: '{{ schema["staging"] }}.{{ user_prefix }}'
-      prefix_models: '{{ schema["models"] }}.{{ user_prefix }}'
+      schema: "{{ schema['logs'] }}"
+      table: "{{ user_prefix }}{{ task.name['create_'|length:] }}"
+
+  copy_from_stage:
+    type: sql
+    file_name: "{{ task.group }}/copy_from_stage.sql"
+    parameters:
+      stage: "{{ task.name.split('_')[1] }}_stage"
+      schema: "{{ schema['logs'] }}"
+      currency: "{{ task.name.split('_')[1] }}"
+      table: "{{ task.name.split('_')[-1] }}"

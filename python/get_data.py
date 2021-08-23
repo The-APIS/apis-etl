@@ -1,7 +1,11 @@
-from sayn import PythonTask
-from os import getcwd, path, makedirs
+# Used to create csv files from tables in snowflake, basically a reverse copy
 
-class getData(PythonTask):
+from os import getcwd, makedirs, path
+
+from sayn import PythonTask
+
+
+class GetData(PythonTask):
 
     def run(self):
 
@@ -44,5 +48,4 @@ class getData(PythonTask):
 
         self.default_db.execute(sql_query)
 
-        #"GET @analytics_models.unload_stage/f_ethereum_token_summary/ file:///Users/tim/get_test"
         return self.success()

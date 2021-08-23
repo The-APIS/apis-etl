@@ -1,0 +1,21 @@
+tasks:
+
+  get_token_summary:
+    type: python
+    class: get_data.GetData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_token_summary
+      path: '/data_downloads/f_ethereum_token_summary'
+
+  get_holders:
+    type: python
+    class: get_data.GetData
+    parameters:
+      file_format: csv_unloading
+      stage: data_unload
+      schema: analytics_models
+      table: f_ethereum_holders
+      path: '/data_downloads/f_ethereum_holders'
