@@ -56,17 +56,6 @@ tasks:
       - bsc_incremental_load
       - create_bsc_tokens
 
-  # extract_other_tables:
-  #   type: python
-  #   class: other_tables_extract.loadData
-  #   parameters:
-  #     file_format: csv_loading
-  #     schema: analytics_logs
-  #     stage: bsc_other_tables
-  #     start_block: 1
-  #     end_block: 2
-  #     max_workers: 10
-
   # extract_bq_ethereum_tokens:
   #   preset: extract_bigquery
   #   source:
