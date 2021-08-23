@@ -1,3 +1,5 @@
+# Used to create csv files from tables in snowflake, basically a reverse copy
+
 from os import getcwd, makedirs, path
 
 from sayn import PythonTask
