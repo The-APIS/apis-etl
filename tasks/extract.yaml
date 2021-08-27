@@ -6,10 +6,11 @@ tasks:
     parameters:
       file_format: csv_unloading
       stage: bsc_stage
-      schema: analytics_logs
+      schema: "{{ schema['logs'] }}"
+      is_test: "{{ is_test }}"
       blockchain: bsc
       blockchain_url: 'https://bsc-dataseed.binance.org'
-      blocks_per_file: 10000
+      blocks_per_file: 1000
       max_workers: 10
 
   update_bsc_blocks:

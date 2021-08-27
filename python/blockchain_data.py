@@ -10,6 +10,7 @@ class LoadData(PythonTask):
         file_format = self.parameters["file_format"]
         stage = self.parameters["stage"]
         schema = self.parameters["schema"]
+        is_test = self.parameters["is_test"]
         blockchain = self.parameters["blockchain"]
         blockchain_url = self.parameters["blockchain_url"]
         blocks_per_file = self.parameters["blocks_per_file"]
@@ -29,15 +30,6 @@ class LoadData(PythonTask):
 
             USE SCHEMA {schema};
 
-            CREATE FILE FORMAT IF NOT EXISTS { file_format }
-                 TYPE = 'CSV'
-                 FIELD_DELIMITER = ','
-                 SKIP_HEADER = 1
-                 NULL_IF = ('0000-00-00 00:00:00')
-                 EMPTY_FIELD_AS_NULL = true
-                 FIELD_OPTIONALLY_ENCLOSED_BY = '"'
-                 ;
-
             CREATE STAGE IF NOT EXISTS { stage }
                  file_format = { file_format };
 
@@ -48,15 +40,32 @@ class LoadData(PythonTask):
 
         get_block_max_query = f'''
 
-        SELECT MAX(NUMBER) AS start_block
+        SELECT MAX(NUMBER) AS last_block
 
         FROM {schema}.{user_prefix}{blockchain}_blocks;
         '''
-        # update with {schema}
 
         data = self.default_db.read_data(get_block_max_query)
 
-        start_block = data[0]["start_block"]
+        try:
+            last_block = data[0]["last_block"]
+        except IndexError:
+            last_block = -1
+
+        max_extracted = []
+
+        for table in tables:
+            list_stage_query = f'''
+
+            LIST @{schema}.{stage}/{table}/;
+            '''
+            staged_files = self.default_db.read_data(list_stage_query)
+            list_to_compare = [int(x['name'].strip(".csv.gz").split("_")[-1]) for x in staged_files]
+            max_extracted.append(max(list_to_compare, default=-1))
+
+        min_max_extracted = min(max_extracted)
+
+        start_block = max(last_block, min_max_extracted) + 1
 
         result = subprocess.run(
         [ "geth"
@@ -273,5 +282,8 @@ class LoadData(PythonTask):
             remove("data_downloads/token_addresses.txt")
 
             start_block += blocks_per_file
+
+            if is_test == 'True':
+                break
 
         return self.success()
