@@ -7,7 +7,7 @@
 3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_load sayn run -t group:extract`
 
 Note: For a quick single test run, command in part 3 should be change to this
-`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' SAYN_PARAMETER_is_test='true' SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_load sayn run -t group:extract` 
+`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_load sayn run -t group:extract`
 
 ## Retrieving Snowflake Data via Docker Container
 
@@ -17,21 +17,23 @@ Note: For a quick single test run, command in part 3 should be change to this
 
 
 ### Variable Explanation
+
+`path_to_save_to` = local path to save the tables to
+
 `your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
 
 #### Credentials Structure
 ```
 {
-  "type": "snowflake"
-  "account": "part before snowflakecomputing in the snowflake url e.g. account = abc100 if url = https://abc100.snowflakecomputing.com/"
-  "user": "your username"
-  "password": "your password"
-  "database": "THEAPIS"
-  "warehouse": "COMPUTE_WH"
+  "type": "snowflake",
+  "account": "part before snowflakecomputing in the snowflake url e.g. account = abc100 if url = https://abc100.snowflakecomputing.com/",
+  "user": "your username",
+  "password": "your password",
+  "database": "THEAPIS",
+  "warehouse": "COMPUTE_WH",
   "role": "ETL"
 }
 ```
-`path_to_save_to` = local path to save the tables to
 
 ## Running Locally
 

@@ -9,7 +9,7 @@ class LoadData(PythonTask):
     def run(self):
         file_format = self.parameters["file_format"]
         stage = self.parameters["stage"]
-        schema = self.parameters["schema"]
+        schema = self.parameters["schema"]["logs"]
         is_test = self.parameters["is_test"]
         blockchain = self.parameters["blockchain"]
         blockchain_url = self.parameters["blockchain_url"]
@@ -18,25 +18,6 @@ class LoadData(PythonTask):
         user_prefix = self.parameters["user_prefix"]
 
         current_directory = getcwd()
-        tables = ['blocks', 'transactions', 'receipts', 'logs', 'token_transfers', 'contracts', 'tokens']
-        for table in tables:
-            full_path = current_directory + '/data_downloads/' + table
-            if path.isdir(full_path):
-                pass
-            else:
-                makedirs(full_path)
-
-        staging_query = f'''
-
-            USE SCHEMA {schema};
-
-            CREATE STAGE IF NOT EXISTS { stage }
-                 file_format = { file_format };
-
-            '''
-        print(f"Creating Stage: { stage }")
-        self.default_db.execute(staging_query)
-
 
         get_block_max_query = f'''
 
@@ -49,6 +30,8 @@ class LoadData(PythonTask):
 
         try:
             last_block = data[0]["last_block"]
+            if last_block is None:
+                last_block = -1
         except IndexError:
             last_block = -1
 
@@ -283,7 +266,7 @@ class LoadData(PythonTask):
 
             start_block += blocks_per_file
 
-            if is_test == 'True':
+            if is_test:
                 break
 
         return self.success()
