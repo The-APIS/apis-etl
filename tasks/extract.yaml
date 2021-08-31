@@ -1,16 +1,31 @@
 tasks:
 
+  bsc_missing_data_load:
+    type: python
+    class: blockchain_data_reload.LoadData
+    parameters:
+      file_format: csv_unloading
+      stage: bsc_stage
+      blockchain: bsc
+      blockchain_url: 'https://bsc-dataseed.binance.org'
+      blocks_per_file: 500
+      max_workers: 10
+    parents:
+      - create_bsc_blocks
+
   bsc_incremental_load:
     type: python
     class: blockchain_data.LoadData
     parameters:
       file_format: csv_unloading
       stage: bsc_stage
-      schema: analytics_logs
       blockchain: bsc
       blockchain_url: 'https://bsc-dataseed.binance.org'
-      blocks_per_file: 10000
+      blocks_per_file: 1000
       max_workers: 10
+    parents:
+      - bsc_missing_data_load
+      - create_bsc_blocks
 
   update_bsc_blocks:
     preset: copy_from_stage
