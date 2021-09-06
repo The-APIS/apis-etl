@@ -1,4 +1,4 @@
-sayn
+sayn==0.5.10
 
 # DB Connectors
 psycopg2-binary==2.8.6
