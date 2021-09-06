@@ -1,8 +1,7 @@
 from os import getcwd, makedirs, path, remove
+import subprocess
 
 from sayn import PythonTask
-
-from .ethereumetl_extract_helper import create_requisite_files, create_put_query, extract_table, get_end_block
 
 
 class LoadData(PythonTask):
@@ -19,8 +18,6 @@ class LoadData(PythonTask):
         user_prefix = self.parameters["user_prefix"]
 
         current_directory = getcwd()
-
-        # Create subdirectories which will allow us to reuse the same file name
         tables = ['blocks', 'transactions', 'receipts', 'logs', 'token_transfers', 'contracts', 'tokens']
         for table in tables:
             full_path = current_directory + '/data_downloads/' + table
@@ -29,7 +26,6 @@ class LoadData(PythonTask):
             else:
                 makedirs(full_path)
 
-        # Create stage if one doesn't exist
         staging_query = f'''
 
             USE SCHEMA {schema};
@@ -41,7 +37,6 @@ class LoadData(PythonTask):
         print(f"Creating Stage: { stage }")
         self.default_db.execute(staging_query)
 
-        # Get all the missing block ranges
         get_missing_block_ranges_query = f'''
             WITH base AS (
             SELECT number
@@ -63,7 +58,6 @@ class LoadData(PythonTask):
 
         missing_block_ranges = self.default_db.read_data(get_missing_block_ranges_query)
 
-        # Load each missing block range in batches determined by blocks per file
         for entry in missing_block_ranges:
             start_block = entry["reload_from"]
             end_block = entry["reload_to"]
@@ -77,51 +71,201 @@ class LoadData(PythonTask):
 
                 file_name = f"data_blocks_{start_block}_{stop_block - 1}.csv"
 
-                # Extract blocks, transactions and transaction hashes
-                extract_table("blocks_and_transactions", blockchain_url, max_workers, file_name)
-                create_requisite_files("transaction_hashes", file_name)
+                print(f"Exporting blocks and transactions for {file_name}")
+                subprocess.run(
+                        [ "ethereumetl"
+                        , "export_blocks_and_transactions"
+                        , "--start-block"
+                        , str(start_block)
+                        , "--end-block"
+                        , str(stop_block - 1)
+                        , "--blocks-output"
+                        , "data_downloads/blocks/" + file_name
+                        , "--transactions-output"
+                        , "data_downloads/transactions/" + file_name
+                        , "--provider-uri"
+                        , blockchain_url
+                        , "--max-workers"
+                        , f"{max_workers}"
+                        ])
 
-                # Put blocks and transactions into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("blocks", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("transactions", schema, stage, current_directory, file_name))
+                print(f"Extracting transaction hashes for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "extract_csv_column"
+                    , "--input"
+                    , f"data_downloads/transactions/{file_name}"
+                    , "--column"
+                    , "hash"
+                    , "--output"
+                    , "data_downloads/transactions/hashes.txt"
+                    ])
+
+                print(f"Putting blocks into snowflake for {file_name}")
+                put_blocks_query = f'''
+
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory}/data_downloads/blocks/{file_name} @{stage}/blocks/ auto_compress=true;
+
+                    '''
+                self.default_db.execute(put_blocks_query)
                 remove(f'data_downloads/blocks/{file_name}')
+
+                print(f"Putting transactions into snowflake for {file_name}")
+                put_transactions_query = f'''
+
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory}/data_downloads/transactions/{file_name} @{stage}/transactions/ auto_compress=true;
+
+                    '''
+                self.default_db.execute(put_transactions_query)
                 remove(f'data_downloads/transactions/{file_name}')
 
-                # Extract logs, receipts and token transfers + remove transaction_hashes.txt from local memory
-                extract_table("receipts_and_logs", blockchain_url, max_workers, file_name)
-                extract_table("token_transfers", blockchain_url, max_workers, file_name)
-                remove('data_downloads/transaction_hashes.txt')
+                print(f"Exporting receipts and logs for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "export_receipts_and_logs"
+                    , "--transaction-hashes"
+                    , "data_downloads/transactions/hashes.txt"
+                    , "--provider-uri"
+                    , blockchain_url
+                    , "--receipts-output"
+                    , f"data_downloads/receipts/{file_name}"
+                    , "--logs-output"
+                    , f"data_downloads/logs/{file_name}"
+                    , "--max-workers"
+                    , f"{max_workers}"
+                    ])
+                remove('data_downloads/transactions/hashes.txt')
 
-                # Put logs and token transfers into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("logs", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("token_transfers", schema, stage, current_directory, file_name))
+                print(f"Exporting token transfers for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "extract_token_transfers"
+                    , "--logs"
+                    , f"data_downloads/logs/{file_name}"
+                    , "--output"
+                    , f"data_downloads/token_transfers/{file_name}"
+                    , "--max-workers"
+                    , f"{max_workers}"
+                    ])
+
+                print(f"Putting logs into snowflake for {file_name}")
+                self.default_db.execute(f'''
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory + '/data_downloads/logs/' + file_name} @{stage}/logs/ auto_compress=true;
+                '''
+                )
                 remove(f"data_downloads/logs/{file_name}")
+
+                print(f"Putting token transfers into snowflake for {file_name}")
+                self.default_db.execute(f'''
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory + '/data_downloads/token_transfers/' + file_name} @{stage}/token_transfers/ auto_compress=true;
+                '''
+                )
                 remove(f"data_downloads/token_transfers/{file_name}")
 
-                # Create contract addresses file, put receipts into snowflake + remove from local memory
-                create_requisite_files("contract_addresses", file_name)
-                self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name))
+                print(f"Extracting contract addresses for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "extract_csv_column"
+                    , "--input"
+                    , f"data_downloads/receipts/{file_name}"
+                    , "--column"
+                    , "contract_address"
+                    , "--output"
+                    , "data_downloads/contract_addresses.txt"
+                    ])
+
+                print(f"Putting receipts into snowflake for {file_name}")
+                self.default_db.execute(f'''
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory + '/data_downloads/receipts/' + file_name} @{stage}/receipts/ auto_compress=true;
+                '''
+                )
                 remove(f"data_downloads/receipts/{file_name}")
 
-                # Extract contracts, token_addresses and tokens
-                extract_table("contracts", blockchain_url, max_workers, file_name)
-                create_requisite_files("token_addresses", file_name)
-                extract_table("tokens", blockchain_url, max_workers, file_name)
+                print(f"Export contracts for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "export_contracts"
+                    , "--contract-addresses"
+                    , "data_downloads/contract_addresses.txt"
+                    , "--provider-uri"
+                    , blockchain_url
+                    , "--output"
+                    , f"data_downloads/contracts/{file_name}"
+                    , "--batch-size"
+                    , "1"
+                    , "--max-workers"
+                    , f"{max_workers}"
+                    ])
 
-                # Put contracts and tokens into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("contracts", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name))
-                remove(f"data_downloads/contracts/{file_name}")
-                remove(f"data_downloads/tokens/{file_name}")
-
-                # Clean up remaining requisite files
+                print(f"Extract token addresses for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "filter_items"
+                    , "-i"
+                    , f"data_downloads/contracts/{file_name}"
+                    , "-p"
+                    , ''"item['is_erc20'] or item['is_erc721']"''
+                    , "--output"
+                    , "data_downloads/filtered_contracts.csv"
+                    ])
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "extract_field"
+                    , "-i"
+                    , "data_downloads/filtered_contracts.csv"
+                    , "-f"
+                    , "address"
+                    , "-o"
+                    , "data_downloads/token_addresses.txt"
+                    ])
                 remove("data_downloads/filtered_contracts.csv")
+
+                print(f"Exporting tokens for {file_name}")
+                subprocess.run(
+                    [ "ethereumetl"
+                    , "export_tokens"
+                    , "--token-addresses"
+                    , "data_downloads/token_addresses.txt"
+                    , "--provider-uri"
+                    , blockchain_url
+                    , "--output"
+                    , f"data_downloads/tokens/{file_name}"
+                    , "--max-workers"
+                    , f"{max_workers}"
+                    ])
+
+                print(f"Putting contracts into snowflake for {file_name}")
+                self.default_db.execute(f'''
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory + '/data_downloads/contracts/' + file_name} @{stage}/contracts/ auto_compress=true;
+                '''
+                )
+                remove(f"data_downloads/contracts/{file_name}")
+
+                print(f"Putting tokens into snowflake for {file_name}")
+                self.default_db.execute(f'''
+                    USE SCHEMA {schema};
+
+                    PUT file://{current_directory + '/data_downloads/tokens/' + file_name} @{stage}/tokens/ auto_compress=true;
+                '''
+                )
+                remove(f"data_downloads/tokens/{file_name}")
                 remove("data_downloads/contract_addresses.txt")
                 remove("data_downloads/token_addresses.txt")
 
                 start_block += blocks_per_file
 
-                # Used to restrict test runs to one batch only
                 if is_test:
                     break
 
