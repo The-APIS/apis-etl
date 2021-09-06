@@ -13,4 +13,7 @@ CREATE TABLE IF NOT EXISTS {{ table }} (
   , gas_price	NUMBER(38,0)
   , input	VARCHAR(16777216)
   , block_timestamp	NUMBER(38,0)
+  , max_fee_per_gas	NUMBER(38,0)
+  , max_priority_fee_per_gas NUMBER(38,0)
+  , transaction_type NUMBER(38,0)
 )

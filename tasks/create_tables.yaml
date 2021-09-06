@@ -1,4 +1,29 @@
 tasks:
+  # Ethereum Tables
+
+  create_eth_blocks:
+    preset: create_table
+
+  create_eth_transactions:
+    preset: create_table
+
+  create_eth_logs:
+    preset: create_table
+
+  create_eth_receipts:
+    preset: create_table
+
+  create_eth_token_transfers:
+    preset: create_table
+    file_name: "create_tables/create_token_transfers.sql"
+
+  create_eth_contracts:
+    preset: create_table
+
+  create_eth_tokens:
+    preset: create_table
+
+  # Binance Tables
 
   create_bsc_blocks:
     preset: create_table
