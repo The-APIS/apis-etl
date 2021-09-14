@@ -1,0 +1,72 @@
+tasks:
+
+  eth_missing_data_load:
+    type: python
+    class: blockchain_data_reload.LoadData
+    parameters:
+      file_format: csv_unloading
+      stage: eth_stage
+      blockchain: eth
+      blockchain_url: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+      blocks_per_file: 500
+      max_workers: 10
+    parents:
+      - create_eth_blocks
+
+  eth_incremental_load:
+    type: python
+    class: blockchain_data.LoadData
+    parameters:
+      file_format: csv_unloading
+      stage: eth_stage
+      blockchain: eth
+      blockchain_url: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+      blocks_per_file: 10000
+      max_workers: 10
+    parents:
+      - eth_missing_data_load
+      - create_eth_blocks
+
+  update_eth_blocks:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_blocks
+
+  update_eth_transactions:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_transactions
+
+  update_eth_token_transfers:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_token_transfers
+    parameters:
+      table: token_transfers
+
+  update_eth_logs:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_logs
+
+  update_eth_receipts:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_receipts
+
+  update_eth_contracts:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_contracts
+
+  update_eth_tokens:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_tokens

@@ -19,4 +19,5 @@ CREATE TABLE IF NOT EXISTS {{ table }} (
   , gas_used NUMBER(38,0)
   , timestamp	TIMESTAMP_NTZ(9)
   , transaction_count	NUMBER(38,0)
+  , base_fee_per_gas NUMBER(38,0)
 )

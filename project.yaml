@@ -96,7 +96,7 @@ presets:
 
   copy_from_stage:
     type: sql
-    file_name: "{{ task.group }}/copy_from_stage.sql"
+    file_name: "extract/copy_from_stage.sql"
     parameters:
       stage: "{{ task.name.split('_')[1] }}_stage"
       schema: "{{ schema['logs'] }}"
