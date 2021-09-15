@@ -78,39 +78,39 @@ class LoadData(PythonTask):
                 file_name = f"data_blocks_{start_block}_{stop_block - 1}.csv"
 
                 # Extract blocks, transactions and transaction hashes
-                extract_table("blocks_and_transactions", blockchain_url, max_workers, file_name)
-                create_requisite_files("transaction_hashes", file_name)
+                extract_table("blocks_and_transactions", blockchain_url, max_workers, file_name, self.logger)
+                create_requisite_files("transaction_hashes", file_name, self.logger)
 
                 # Put blocks and transactions into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("blocks", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("transactions", schema, stage, current_directory, file_name))
+                self.default_db.execute(create_put_query("blocks", schema, stage, current_directory, file_name, self.logger))
+                self.default_db.execute(create_put_query("transactions", schema, stage, current_directory, file_name, self.logger))
                 remove(f'data_downloads/blocks/{file_name}')
                 remove(f'data_downloads/transactions/{file_name}')
 
                 # Extract logs, receipts and token transfers + remove transaction_hashes.txt from local memory
-                extract_table("receipts_and_logs", blockchain_url, max_workers, file_name)
-                extract_table("token_transfers", blockchain_url, max_workers, file_name)
+                extract_table("receipts_and_logs", blockchain_url, max_workers, file_name, self.logger)
+                extract_table("token_transfers", blockchain_url, max_workers, file_name, self.logger)
                 remove('data_downloads/transaction_hashes.txt')
 
                 # Put logs and token transfers into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("logs", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("token_transfers", schema, stage, current_directory, file_name))
+                self.default_db.execute(create_put_query("logs", schema, stage, current_directory, file_name, self.logger))
+                self.default_db.execute(create_put_query("token_transfers", schema, stage, current_directory, file_name, self.logger))
                 remove(f"data_downloads/logs/{file_name}")
                 remove(f"data_downloads/token_transfers/{file_name}")
 
                 # Create contract addresses file, put receipts into snowflake + remove from local memory
-                create_requisite_files("contract_addresses", file_name)
-                self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name))
+                create_requisite_files("contract_addresses", file_name, self.logger)
+                self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name, self.logger))
                 remove(f"data_downloads/receipts/{file_name}")
 
                 # Extract contracts, token_addresses and tokens
-                extract_table("contracts", blockchain_url, max_workers, file_name)
-                create_requisite_files("token_addresses", file_name)
-                extract_table("tokens", blockchain_url, max_workers, file_name)
+                extract_table("contracts", blockchain_url, max_workers, file_name, self.logger)
+                create_requisite_files("token_addresses", file_name, self.logger)
+                extract_table("tokens", blockchain_url, max_workers, file_name, self.logger)
 
                 # Put contracts and tokens into snowflake + remove from local memory
-                self.default_db.execute(create_put_query("contracts", schema, stage, current_directory, file_name))
-                self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name))
+                self.default_db.execute(create_put_query("contracts", schema, stage, current_directory, file_name, self.logger))
+                self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name, self.logger))
                 remove(f"data_downloads/contracts/{file_name}")
                 remove(f"data_downloads/tokens/{file_name}")
 

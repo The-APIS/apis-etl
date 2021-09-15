@@ -9,6 +9,10 @@ parameters:
 
   is_test: false
 
+  blockchain:
+    bsc: 'https://bsc-dataseed.binance.org'
+    eth: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+
   from_prod:
 
 required_credentials:

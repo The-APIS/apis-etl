@@ -11,8 +11,8 @@ def get_end_block(blockchain_url):
                             , text=True)
     return(int(result.stdout.strip('\n')))
 
-def create_requisite_files(file_type, file_name):
-    print(f"Extracting {file_type} for {file_name}")
+def create_requisite_files(file_type, file_name, logger):
+    logger.info(f"Extracting {file_type} for {file_name}")
     extract_sk = [ "ethereumetl"
                  , "extract_csv_column"
                  , "--input"
@@ -50,8 +50,8 @@ def create_requisite_files(file_type, file_name):
     for process in processes_to_run:
         subprocess.run(process)
 
-def create_put_query(table_name, schema, stage, current_directory, file_name):
-    print(f"Putting {table_name} into snowflake for {file_name}")
+def create_put_query(table_name, schema, stage, current_directory, file_name, logger):
+    logger.info(f"Putting {table_name} into snowflake for {file_name}")
     return (
     f'''
         USE SCHEMA {schema};
@@ -60,8 +60,8 @@ def create_put_query(table_name, schema, stage, current_directory, file_name):
     '''
     )
 
-def extract_table(table_name, blockchain_url, max_workers, file_name):
-    print(f"Exporting {table_name} for {file_name}")
+def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
+    logger.info(f"Exporting {table_name} for {file_name}")
     base_subprocess = [ "ethereumetl"
                       , f"export_{table_name}"
                       , "--max-workers"

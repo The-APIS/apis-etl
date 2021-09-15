@@ -7,7 +7,7 @@ tasks:
       file_format: csv_unloading
       stage: eth_stage
       blockchain: eth
-      blockchain_url: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+      blockchain_url: "{{ blockchain['eth'] }}"
       blocks_per_file: 500
       max_workers: 10
     parents:
@@ -20,8 +20,8 @@ tasks:
       file_format: csv_unloading
       stage: eth_stage
       blockchain: eth
-      blockchain_url: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
-      blocks_per_file: 10000
+      blockchain_url: "{{ blockchain['eth'] }}"
+      blocks_per_file: 100
       max_workers: 10
     parents:
       - eth_missing_data_load
