@@ -14,10 +14,8 @@ RUN apt-get -y install python3.8
 
 RUN apt-get -y install python3-pip
 
-RUN pip install ethereum-etl==1.7.3 
-
 WORKDIR /app
 
 COPY . .
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements_eth.txt
