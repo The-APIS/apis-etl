@@ -4,11 +4,11 @@
 
 1. Clone the repository and change directory to the cloned repo
 2. Run `docker build . -t incremental_eth_load`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth -d`
 
 Note: For a quick single test run, command in part 3 should be change to this
 
-`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth`
+`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth -d`
 
 ## Retrieving Snowflake Data via Docker Container
 
