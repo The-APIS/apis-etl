@@ -4,21 +4,11 @@
 
 1. Clone the repository and change directory to the cloned repo
 2. Run `docker build . -t incremental_bsc_load`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc -d`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc`
 
 Note: For a quick single test run, command in part 3 should be change to this
 
-`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc -d`
-
-## Scheduling Ethereum Incremental Load Into Snowflake via Docker Container
-
-1. Clone the repository and change directory to the cloned repo
-2. Run `docker build . -t incremental_eth_load`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth -d`
-
-Note: For a quick single test run, command in part 3 should be change to this
-
-`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth -d`
+`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc`
 
 ## Retrieving Snowflake Data via Docker Container
 
@@ -31,9 +21,7 @@ Note: For a quick single test run, command in part 3 should be change to this
 
 `path_to_save_to` = local path to save the tables to
 
-`your_snowflake_credentials` = this should be changed to your snowflake credentials in JSON format
-
-`your_node_locations` = this should be changed to a list of your node locations in JSON format
+`your_snowflake_credentials` : this should be changed to your snowflake credentials in JSON format
 
 #### Credentials Structure
 ```
@@ -45,14 +33,6 @@ Note: For a quick single test run, command in part 3 should be change to this
   "database": "THEAPIS",
   "warehouse": "COMPUTE_WH",
   "role": "ETL"
-}
-```
-
-#### Blockchain Node Locations Structure
-```
-{
-  "bsc": "https://bsc-dataseed.binance.org"
-  "eth": "path to your local ethereum node"
 }
 ```
 
@@ -80,7 +60,6 @@ profiles:
   test:
     credentials:
       warehouse: snowflake
-
     parameters:
       user_prefix: your_initials
       is_test: true
