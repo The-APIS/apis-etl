@@ -14,8 +14,6 @@ RUN apt-get -y install python3.8
 
 RUN apt-get -y install python3-pip
 
-RUN pip install -e git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereumetl
-
 WORKDIR /app
 
 COPY . .
