@@ -48,13 +48,21 @@ profiles:
   prod:
     credentials:
       warehouse: snowflake
+    parameters:
+      user_prefix: ""
+      is_test: false
+      schema:
+        logs: analytics_logs
+        staging: analytics_staging
+        models: analytics_models
+        viz: analytics_viz
 
   test:
     credentials:
       warehouse: snowflake
-
     parameters:
       user_prefix: your_initials
+      is_test: true
       schema:
         logs: test_logs
         staging: test_staging
