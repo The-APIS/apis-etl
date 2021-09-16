@@ -7,7 +7,7 @@ tasks:
       file_format: csv_unloading
       stage: bsc_stage
       blockchain: bsc
-      blockchain_url: 'https://bsc-dataseed.binance.org'
+      blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 500
       max_workers: 10
     parents:
@@ -20,7 +20,7 @@ tasks:
       file_format: csv_unloading
       stage: bsc_stage
       blockchain: bsc
-      blockchain_url: 'https://bsc-dataseed.binance.org'
+      blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 1000
       max_workers: 10
     parents:

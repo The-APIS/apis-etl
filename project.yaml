@@ -9,6 +9,10 @@ parameters:
 
   is_test: false
 
+  blockchain:
+    bsc: 'https://bsc-dataseed.binance.org'
+    eth: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+
   from_prod:
 
 required_credentials:
@@ -89,7 +93,7 @@ presets:
 
   create_table:
     type: sql
-    file_name: "{{ task.group }}/{{ task.name.split('_')[0] }}_{{ task.name.split('_')[-1] }}.sql"
+    file_name: "create_tables/{{ task.name.split('_')[0] }}_{{ task.name.split('_')[-1] }}.sql"
     parameters:
       schema: "{{ schema['logs'] }}"
       table: "{{ user_prefix }}{{ task.name['create_'|length:] }}"
