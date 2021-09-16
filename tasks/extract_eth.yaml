@@ -21,7 +21,7 @@ tasks:
       stage: eth_stage
       blockchain: eth
       blockchain_url: "{{ blockchain['eth'] }}"
-      blocks_per_file: 10000
+      blocks_per_file: 10
       max_workers: 10
     parents:
       - eth_missing_data_load

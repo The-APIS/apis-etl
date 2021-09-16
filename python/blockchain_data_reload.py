@@ -38,7 +38,7 @@ class LoadData(PythonTask):
                  file_format = { file_format };
 
             '''
-        print(f"Creating Stage: { stage }")
+        self.logger.info(f"Creating Stage: { stage }")
         self.default_db.execute(staging_query)
 
         # Get all the missing block ranges
