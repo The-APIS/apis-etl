@@ -1,5 +1,4 @@
 sayn==0.5.10
-ethereum-etl==1.7.3 
 
 # DB Connectors
 psycopg2-binary==2.8.6
