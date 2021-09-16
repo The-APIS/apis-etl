@@ -3,17 +3,17 @@
 ## Scheduling BSC Incremental Load Into Snowflake via Docker Container
 
 1. Clone the repository and change directory to the cloned repo
-2. Run `docker build . -t incremental_bsc_load`
-3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc -d`
+2. Run `docker build . -f Dockerfile_bsc -t incremental_bsc_load`
+3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' incremental_bsc_load sayn run -t group:create_bsc_tables -t group:extract_bsc -d`
 
 Note: For a quick single test run, command in part 3 should be change to this
 
-`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_bsc_load sayn run -t group:create_tables -t group:extract_bsc -d`
+`docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_is_test='true' -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' incremental_bsc_load sayn run -t group:create_bsc_tables -t group:extract_bsc -d`
 
 ## Scheduling Ethereum Incremental Load Into Snowflake via Docker Container
 
 1. Clone the repository and change directory to the cloned repo
-2. Run `docker build . -t incremental_eth_load`
+2. Run `docker build . -f Dockerfile_eth -t incremental_eth_load`
 3. Run `docker run -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' -e SAYN_PARAMETER_blockchain='your_node_locations' incremental_eth_load sayn run -t group:create_eth_tables -t group:extract_eth -d`
 
 Note: For a quick single test run, command in part 3 should be change to this
@@ -110,4 +110,3 @@ credentials:
     warehouse: COMPUTE_WH
     role: ETL
 ```
-
