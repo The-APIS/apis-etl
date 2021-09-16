@@ -21,7 +21,7 @@ tasks:
       stage: bsc_stage
       blockchain: bsc
       blockchain_url: "{{ blockchain['bsc'] }}"
-      blocks_per_file: 100
+      blocks_per_file: 1000
       max_workers: 10
     parents:
       - bsc_missing_data_load
