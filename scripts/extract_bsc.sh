@@ -3,9 +3,9 @@
 base_dir="$(realpath $(dirname "$0")/..)"
 
 cd "$base_dir"
-source venvs/eth_etl/bin/activate
-sayn run -t group:create_eth_tables
+source venvs/bsc_etl/bin/activate
+sayn run -t group:create_bsc_tables
 scripts/alert.py
-sayn run -t group:extract_eth
+sayn run -t group:extract_bsc
 scripts/alert.py
 deactivate
