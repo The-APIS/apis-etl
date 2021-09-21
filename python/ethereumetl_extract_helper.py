@@ -1,6 +1,8 @@
 import subprocess
 
 def get_end_block(blockchain_url):
+    if blockchain_url.startswith('file://'):
+        blockchain_url = blockchain_url[len('file://'):]
     result = subprocess.run([ "geth"
                             , "attach"
                             , blockchain_url
