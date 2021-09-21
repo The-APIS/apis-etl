@@ -1,8 +1,6 @@
 import subprocess
 
 def get_end_block(blockchain_url):
-    if blockchain_url.startswith('file://'):
-        blockchain_url = blockchain_url[len('file://'):]
     result = subprocess.run([ "geth"
                             , "attach"
                             , blockchain_url
@@ -63,6 +61,8 @@ def create_put_query(table_name, schema, stage, current_directory, file_name, lo
     )
 
 def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
+    if not blockchain_url.startswith('https://') :
+        blockchain_url = "file://" + blockchain_url
     logger.info(f"Exporting {table_name} for {file_name}")
     base_subprocess = [ "ethereumetl"
                       , f"export_{table_name}"
