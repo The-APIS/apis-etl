@@ -56,6 +56,8 @@ Note: For a quick single test run, command in part 3 should be change to this
 }
 ```
 
+When using a local node, the values above is expected to be a standard unix path (eg: `/var/ipc/ethereum.ipc`).
+
 ## Running Locally
 
 You will need to create a `settings.yaml` file, with the following structure:
