@@ -9,31 +9,29 @@ volumes: [
   hostPathVolume(mountPath: '/app', hostPath: '/'),
 ]) {
   node(label) {
-    def ethereumetl
+    def etlbsc
     def myRepo = checkout scm
     def gitCommit = myRepo.GIT_COMMIT
     def gitBranch = myRepo.GIT_BRANCH
     def shortGitCommit = "${gitCommit[0..10]}"
     def previousGitCommit = sh(script: "git rev-parse ${gitCommit}~", returnStdout: true)
 
-    def ethereumetlImageName = "apis-ethereum-etl"
+    def etlbscImageName = "apis-etl-bsc"
 
-    def ethereumetlImage = "${env.DOCKER_REGISTRY}/${ethereumetlImageName}"
+    def etlbscImage = "${env.DOCKER_REGISTRY}/${etlbscImageName}"
 
     container('docker') {
-      stage('Build ethereumetl') {
+      stage('Build etlbsc') {
         checkout scm
-        dir('ethereumetl') {
-          ethereumetl = docker.build("${ethereumetlImage}", "-f Production.Dockerfile .")
-        }
+          etlbsc = docker.build("${etlbscImage}", "-f Dockerfile_bsc .")
       }
       
       stage('Push') {
         sh """
-          docker tag ${ethereumetlImage} ${ethereumetlImage}:latest
+          docker tag ${etlbscImage} ${etlbscImage}:latest
           """
         docker.withRegistry("https://${env.DOCKER_REGISTRY}") {
-          ethereumetl.push("latest")
+          etlbsc.push("latest")
         }
       }
     }
