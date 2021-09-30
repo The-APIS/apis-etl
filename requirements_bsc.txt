@@ -5,3 +5,7 @@ git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereumetl
 psycopg2-binary==2.8.6
 snowflake-connector-python==2.4.3
 snowflake-sqlalchemy==1.2.4
+pyetherchain==0.3.2
+mythril==0.19.6
+requests==2.26.0
+
