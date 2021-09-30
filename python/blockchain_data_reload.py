@@ -121,8 +121,8 @@ class LoadData(PythonTask):
 
                 start_block += blocks_per_file
 
-                # Used to restrict test runs to one batch only
-                if is_test:
-                    break
+            # Used to restrict test runs to one batch only
+            if is_test:
+                break
 
         return self.success()
