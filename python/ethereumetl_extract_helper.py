@@ -3,6 +3,9 @@ import requests
 
 
 def get_end_block(blockchain_url):
+    # TODO we've switched to using connecting directly to the node,
+    #      however this probably wouldn't work with socket connection
+
     # result = subprocess.run([ "geth"
     #                         , "attach"
     #                         , blockchain_url
