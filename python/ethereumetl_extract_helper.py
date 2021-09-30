@@ -15,10 +15,10 @@ def get_end_block(blockchain_url):
 
     result = requests.post(
         blockchain_url,
-        headers={"Content-Type: application/json"},
+        headers={"Content-Type": "application/json"},
         json={"jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": 0},
     )
-    return result.json()["result"]
+    return int(result.json()["result"], 16)
 
 
 def create_requisite_files(file_type, file_name, logger):
