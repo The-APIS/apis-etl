@@ -12,6 +12,7 @@ class LoadData(PythonTask):
         stage = self.parameters["stage"]
         schema = self.parameters["schema"]["logs"]
         is_test = self.parameters["is_test"]
+        test_values = self.parameters["test_values"]
         blockchain = self.parameters["blockchain"]
         blockchain_url = self.parameters["blockchain_url"]
         blocks_per_file = self.parameters["blocks_per_file"]
@@ -39,11 +40,22 @@ class LoadData(PythonTask):
             max_extracted.append(max(list_to_compare, default=-1))
         min_max_extracted = min(max_extracted)
 
-        # Start the extract at the last loaded block (includes table and stage)
+        # Start the extract at the last loaded block (includes table and stage) or testing start block if it's the largest
         start_block = max(last_block, min_max_extracted) + 1
 
         # Get the latest block number from the blockchain, set this as the end of the extract
         end_block = get_end_block(blockchain_url)
+
+        # Set test run values
+        if is_test:
+            # Start block overwrite
+            if start_block < test_values["start_block"]:
+                start_block = test_values["start_block"]
+            # End block overwrite
+            if start_block < test_values["end_block"]:
+                end_block = test_values["end_block"]
+                # Don't break loop if valid end_block is given
+                is_test = False
 
         # Repeat the extract process until reaching end block, using batches of blocks controlled by blocks_per_file parameter
         while end_block > start_block:

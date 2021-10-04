@@ -120,9 +120,12 @@ class LoadData(PythonTask):
                 remove("data_downloads/token_addresses.txt")
 
                 start_block += blocks_per_file
-
+                # Used to restrict test runs to one batch only
+                if is_test:
+                    break
             # Used to restrict test runs to one batch only
             if is_test:
                 break
+            ## Double break is used here to get around multiple entries with large ranges when testing
 
         return self.success()

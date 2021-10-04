@@ -58,6 +58,23 @@ Note: For a quick single test run, command in part 3 should be change to this
 
 When using a local node, the values above is expected to be a standard unix path (eg: `/var/ipc/ethereum.ipc`).
 
+#### Test Values Parameter (Optional)
+
+Structure:
+
+```
+{
+  "start_block": "your start block number for testing"
+  "end_block": "your end block number for testing"
+}
+```
+
+Note: start_block and end_block are integers not strings
+
+This parameter can be modified to change start and end blocks of a test (not specifying this parameter will result in a default test)
+
+You can add this parameter after the `docker run` command, e.g. `docker run -e SAYN_PARAMETER_test_values='your_test_values'...`
+
 ## Running Locally
 
 You will need to create a `settings.yaml` file, with the following structure:
@@ -72,7 +89,6 @@ profiles:
       warehouse: snowflake
     parameters:
       user_prefix: ""
-      is_test: false
       schema:
         logs: analytics_logs
         staging: analytics_staging
@@ -86,6 +102,9 @@ profiles:
     parameters:
       user_prefix: your_initials
       is_test: true
+      test_values:
+        start_block: your_test_start_block
+        end_block: your_test_end_block
       schema:
         logs: test_logs
         staging: test_staging

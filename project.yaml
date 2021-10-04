@@ -9,6 +9,10 @@ parameters:
 
   is_test: false
 
+  test_values:
+    start_block: -1
+    end_block: -1
+
   blockchain:
     bsc: 'https://bsc-dataseed.binance.org'
     eth: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
