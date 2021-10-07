@@ -52,7 +52,7 @@ class LoadData(PythonTask):
             if start_block < test_values["start_block"]:
                 start_block = test_values["start_block"]
             # End block overwrite
-            if start_block < test_values["end_block"]:
+            if start_block <= test_values["end_block"]:
                 end_block = test_values["end_block"]
                 # Don't break loop if valid end_block is given
                 is_test = False
