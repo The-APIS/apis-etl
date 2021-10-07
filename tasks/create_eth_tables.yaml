@@ -21,3 +21,7 @@ tasks:
 
   create_eth_tokens:
     preset: create_table
+
+  create_eth_geth_traces:
+    preset: create_table
+    file_name: "create_tables/create_geth_traces.sql"

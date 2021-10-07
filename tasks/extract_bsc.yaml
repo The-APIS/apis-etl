@@ -10,6 +10,7 @@ tasks:
       blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 500
       max_workers: 10
+      is_archive: false
     parents:
       - create_bsc_blocks
 
@@ -23,6 +24,7 @@ tasks:
       blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 1000
       max_workers: 10
+      is_archive: false
     parents:
       - bsc_missing_data_load
       - create_bsc_blocks

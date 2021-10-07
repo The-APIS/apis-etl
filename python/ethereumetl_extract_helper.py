@@ -62,6 +62,12 @@ def create_requisite_files(file_type, file_name, logger):
         extract_sk[5] = "data_downloads/token_addresses.txt"
         extract_sk[6], extract_sk[7] = "-f", "address"
 
+    elif file_type == "geth_traces":
+        extract_sk = extract_sk[:-2]
+        extract_sk[1] = "extract_geth_traces"
+        extract_sk[3] = f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}"
+        extract_sk[5] = f"data_downloads/geth_traces/{file_name}"
+
     processes_to_run.append(extract_sk)
 
     for process in processes_to_run:
@@ -140,6 +146,21 @@ def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
             f"data_downloads/logs/{file_name}",
             "--output",
             f"data_downloads/token_transfers/{file_name}",
+        ]
+
+    elif table_name == "geth_traces":
+        start_block, stop_block = (
+            file_name.split("_")[2],
+            file_name.split("_")[3].strip(".csv"),
+        )
+        del base_subprocess[2:4]
+        additional_parts = [
+            "--start-block",
+            start_block,
+            "--end-block",
+            stop_block,
+            "--output",
+            f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}"
         ]
 
     # Run the command with additional parts

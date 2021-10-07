@@ -16,12 +16,18 @@ class LoadData(PythonTask):
         blockchain_url = self.parameters["blockchain_url"]
         blocks_per_file = self.parameters["blocks_per_file"]
         max_workers = self.parameters["max_workers"]
+        is_archive = self.parameters["is_archive"]
         user_prefix = self.parameters["user_prefix"]
 
         current_directory = getcwd()
 
         # Create subdirectories which will allow us to reuse the same file name
         tables = ['blocks', 'transactions', 'receipts', 'logs', 'token_transfers', 'contracts', 'tokens']
+
+        # Check if traces are available
+        if is_archive:
+            tables.append('geth_traces')
+
         for table in tables:
             full_path = current_directory + '/data_downloads/' + table
             if path.isdir(full_path):
@@ -113,6 +119,14 @@ class LoadData(PythonTask):
                 self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name, self.logger))
                 remove(f"data_downloads/contracts/{file_name}")
                 remove(f"data_downloads/tokens/{file_name}")
+
+                # If archive node is available, extract and put geth traces into snowflake + remove files from local memory
+                if is_archive:
+                    extract_table("geth_traces", blockchain_url, max_workers, file_name, self.logger)
+                    create_requisite_files("geth_traces", file_name, self.logger)
+                    self.default_db.execute(create_put_query("geth_traces", schema, stage, current_directory, file_name, self.logger))
+                    remove(f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}")
+                    remove(f"data_downloads/geth_traces/{file_name}")
 
                 # Clean up remaining requisite files
                 remove("data_downloads/filtered_contracts.csv")

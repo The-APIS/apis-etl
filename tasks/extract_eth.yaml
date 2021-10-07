@@ -8,8 +8,9 @@ tasks:
       stage: eth_stage
       blockchain: eth
       blockchain_url: "{{ blockchain['eth'] }}"
-      blocks_per_file: 500
+      blocks_per_file: 10
       max_workers: 10
+      is_archive: true
     parents:
       - create_eth_blocks
 
@@ -23,6 +24,7 @@ tasks:
       blockchain_url: "{{ blockchain['eth'] }}"
       blocks_per_file: 10000
       max_workers: 10
+      is_archive: true
     parents:
       - eth_missing_data_load
       - create_eth_blocks
@@ -70,3 +72,11 @@ tasks:
     parents:
       - eth_incremental_load
       - create_eth_tokens
+
+  update_eth_geth_traces:
+    preset: copy_from_stage
+    parents:
+      - eth_incremental_load
+      - create_eth_geth_traces
+    parameters:
+      table: geth_traces

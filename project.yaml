@@ -15,7 +15,7 @@ parameters:
 
   blockchain:
     bsc: 'https://bsc-dataseed.binance.org'
-    eth: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
+    eth: 'https://archive.mainnet.ethereum.nodes-mainnet.theapis.io'
 
   from_prod:
 
