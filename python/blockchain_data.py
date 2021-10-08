@@ -57,13 +57,13 @@ class LoadData(PythonTask):
             if start_block < test_values["start_block"]:
                 start_block = test_values["start_block"]
             # End block overwrite
-            if start_block < test_values["end_block"]:
+            if start_block <= test_values["end_block"]:
                 end_block = test_values["end_block"]
                 # Don't break loop if valid end_block is given
                 is_test = False
 
         # Repeat the extract process until reaching end block, using batches of blocks controlled by blocks_per_file parameter
-        while end_block > start_block:
+        while end_block >= start_block:
 
             if end_block > start_block + blocks_per_file:
                 stop_block = start_block + blocks_per_file
@@ -72,42 +72,42 @@ class LoadData(PythonTask):
 
             file_name = f"data_blocks_{start_block}_{stop_block - 1}.csv"
 
-            # # Extract blocks, transactions and transaction hashes
-            # extract_table("blocks_and_transactions", blockchain_url, max_workers, file_name, self.logger)
-            # create_requisite_files("transaction_hashes", file_name, self.logger)
-            #
-            # # Put blocks and transactions into snowflake + remove from local memory
-            # self.default_db.execute(create_put_query("blocks", schema, stage, current_directory, file_name, self.logger))
-            # self.default_db.execute(create_put_query("transactions", schema, stage, current_directory, file_name, self.logger))
-            # remove(f'data_downloads/blocks/{file_name}')
-            # remove(f'data_downloads/transactions/{file_name}')
-            #
-            # # Extract logs, receipts and token transfers + remove transaction_hashes.txt from local memory
-            # extract_table("receipts_and_logs", blockchain_url, max_workers, file_name, self.logger)
-            # extract_table("token_transfers", blockchain_url, max_workers, file_name, self.logger)
-            # remove('data_downloads/transaction_hashes.txt')
-            #
-            # # Put logs and token transfers into snowflake + remove from local memory
-            # self.default_db.execute(create_put_query("logs", schema, stage, current_directory, file_name, self.logger))
-            # self.default_db.execute(create_put_query("token_transfers", schema, stage, current_directory, file_name, self.logger))
-            # remove(f"data_downloads/logs/{file_name}")
-            # remove(f"data_downloads/token_transfers/{file_name}")
-            #
-            # # Create contract addresses file, put receipts into snowflake + remove from local memory
-            # create_requisite_files("contract_addresses", file_name, self.logger)
-            # self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name, self.logger))
-            # remove(f"data_downloads/receipts/{file_name}")
-            #
-            # # Extract contracts, token_addresses and tokens
-            # extract_table("contracts", blockchain_url, max_workers, file_name, self.logger)
-            # create_requisite_files("token_addresses", file_name, self.logger)
-            # extract_table("tokens", blockchain_url, max_workers, file_name, self.logger)
-            #
-            # # Put contracts and tokens into snowflake + remove from local memory
-            # self.default_db.execute(create_put_query("contracts", schema, stage, current_directory, file_name, self.logger))
-            # self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name, self.logger))
-            # remove(f"data_downloads/contracts/{file_name}")
-            # remove(f"data_downloads/tokens/{file_name}")
+            # Extract blocks, transactions and transaction hashes
+            extract_table("blocks_and_transactions", blockchain_url, max_workers, file_name, self.logger)
+            create_requisite_files("transaction_hashes", file_name, self.logger)
+
+            # Put blocks and transactions into snowflake + remove from local memory
+            self.default_db.execute(create_put_query("blocks", schema, stage, current_directory, file_name, self.logger))
+            self.default_db.execute(create_put_query("transactions", schema, stage, current_directory, file_name, self.logger))
+            remove(f'data_downloads/blocks/{file_name}')
+            remove(f'data_downloads/transactions/{file_name}')
+
+            # Extract logs, receipts and token transfers + remove transaction_hashes.txt from local memory
+            extract_table("receipts_and_logs", blockchain_url, max_workers, file_name, self.logger)
+            extract_table("token_transfers", blockchain_url, max_workers, file_name, self.logger)
+            remove('data_downloads/transaction_hashes.txt')
+
+            # Put logs and token transfers into snowflake + remove from local memory
+            self.default_db.execute(create_put_query("logs", schema, stage, current_directory, file_name, self.logger))
+            self.default_db.execute(create_put_query("token_transfers", schema, stage, current_directory, file_name, self.logger))
+            remove(f"data_downloads/logs/{file_name}")
+            remove(f"data_downloads/token_transfers/{file_name}")
+
+            # Create contract addresses file, put receipts into snowflake + remove from local memory
+            create_requisite_files("contract_addresses", file_name, self.logger)
+            self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name, self.logger))
+            remove(f"data_downloads/receipts/{file_name}")
+
+            # Extract contracts, token_addresses and tokens
+            extract_table("contracts", blockchain_url, max_workers, file_name, self.logger)
+            create_requisite_files("token_addresses", file_name, self.logger)
+            extract_table("tokens", blockchain_url, max_workers, file_name, self.logger)
+
+            # Put contracts and tokens into snowflake + remove from local memory
+            self.default_db.execute(create_put_query("contracts", schema, stage, current_directory, file_name, self.logger))
+            self.default_db.execute(create_put_query("tokens", schema, stage, current_directory, file_name, self.logger))
+            remove(f"data_downloads/contracts/{file_name}")
+            remove(f"data_downloads/tokens/{file_name}")
 
             # If archive node is available, extract and put geth traces into snowflake + remove files from local memory
             if is_archive:
@@ -118,9 +118,9 @@ class LoadData(PythonTask):
                 remove(f"data_downloads/geth_traces/{file_name}")
 
             # Clean up remaining requisite files
-            # remove("data_downloads/filtered_contracts.csv")
-            # remove("data_downloads/contract_addresses.txt")
-            # remove("data_downloads/token_addresses.txt")
+            remove("data_downloads/filtered_contracts.csv")
+            remove("data_downloads/contract_addresses.txt")
+            remove("data_downloads/token_addresses.txt")
 
             start_block += blocks_per_file
 
