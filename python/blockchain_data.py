@@ -58,7 +58,7 @@ class LoadData(PythonTask):
                 is_test = False
 
         # Repeat the extract process until reaching end block, using batches of blocks controlled by blocks_per_file parameter
-        while end_block > start_block:
+        while end_block >= start_block:
 
             if end_block > start_block + blocks_per_file:
                 stop_block = start_block + blocks_per_file
