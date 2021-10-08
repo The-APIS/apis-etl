@@ -8,12 +8,14 @@
 
 Note: For a quick single test run, command in part 3 should be change to this
 
-`docker run \
+```
+docker run \
   -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
   -e SAYN_PARAMETER_is_test='true' \
   -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' \ 
   incremental_bsc_load \
-  sayn run -t group:create_bsc_tables -t group:extract_bsc -d`
+  sayn run -t group:create_bsc_tables -t group:extract_bsc -d
+```
 
 ## Scheduling Ethereum Incremental Load Into Snowflake via Docker Container
 
