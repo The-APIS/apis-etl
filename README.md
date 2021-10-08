@@ -21,14 +21,17 @@ docker run \
 
 1. Clone the repository and change directory to the cloned repo
 2. Run 
-```docker build . -f Dockerfile_eth -t incremental_eth_load```
+```
+docker build . -f Dockerfile_eth -t incremental_eth_load
+```
 4. Run 
-```docker run \
-    -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
-    -e SAYN_PARAMETER_blockchain='your_node_locations' \ 
-    incremental_eth_load \ 
-    sayn run -t group:create_eth_tables -t group:extract_eth -d
- ```
+```
+docker run \
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
+  -e SAYN_PARAMETER_blockchain='your_node_locations' \ 
+  incremental_eth_load \ 
+  sayn run -t group:create_eth_tables -t group:extract_eth -d
+```
 
 Note: For a quick single test run, command in part 3 should be change to this
 
