@@ -31,11 +31,11 @@ tasks:
 
   update_eth_token_transfers:
     preset: copy_from_stage
+    parameters:
+      table: token_transfers
     parents:
       - eth_incremental_load
       - create_eth_token_transfers
-    parameters:
-      table: token_transfers
 
   update_eth_logs:
     preset: copy_from_stage
@@ -63,8 +63,8 @@ tasks:
 
   update_eth_geth_traces:
     preset: copy_from_stage
+    parameters:
+      table: geth_traces
     parents:
       - eth_incremental_load
       - create_eth_geth_traces
-    parameters:
-      table: geth_traces

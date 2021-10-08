@@ -30,11 +30,11 @@ tasks:
 
   update_bsc_token_transfers:
     preset: copy_from_stage
+    parameters:
+      table: token_transfers
     parents:
       - bsc_incremental_load
       - create_bsc_token_transfers
-    parameters:
-      table: token_transfers
 
   update_bsc_logs:
     preset: copy_from_stage
