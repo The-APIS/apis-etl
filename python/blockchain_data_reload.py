@@ -8,7 +8,6 @@ from .ethereumetl_extract_helper import create_requisite_files, create_put_query
 class LoadData(PythonTask):
 
     def run(self):
-        file_format = self.parameters["file_format"]
         schema = self.parameters["schema"]["logs"]
         is_test = self.parameters["is_test"]
         blocks_per_file = self.parameters["blocks_per_file"]
@@ -43,7 +42,7 @@ class LoadData(PythonTask):
             USE SCHEMA {schema};
 
             CREATE STAGE IF NOT EXISTS { stage }
-                 file_format = { file_format };
+                 file_format = csv_unloading;
 
             '''
         self.logger.info(f"Creating Stage: { stage }")

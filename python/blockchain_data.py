@@ -8,7 +8,6 @@ from .ethereumetl_extract_helper import create_requisite_files, create_put_query
 class LoadData(PythonTask):
 
     def run(self):
-        file_format = self.parameters["file_format"]
         schema = self.parameters["schema"]["logs"]
         is_test = self.parameters["is_test"]
         test_values = self.parameters["test_values"]
