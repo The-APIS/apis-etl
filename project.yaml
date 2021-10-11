@@ -13,7 +13,13 @@ parameters:
     start_block: -1
     end_block: -1
 
+# Should be overwritten with local node paths during deployment
   blockchain:
+    bsc: 'https://bsc-dataseed.binance.org'
+    eth: 'https://archive.mainnet.ethereum.nodes-mainnet.theapis.io'
+
+# Used for getting end blocks
+  blockchain_jsonrpc:
     bsc: 'https://bsc-dataseed.binance.org'
     eth: 'https://archive.mainnet.ethereum.nodes-mainnet.theapis.io'
 
@@ -116,9 +122,7 @@ presets:
     class: blockchain_data.LoadData
     parameters:
       file_format: csv_unloading
-      stage: "{{ task.name.split('_')[0] }}_stage"
-      blockchain: "{{ task.name.split('_')[0] }}"
-      blockchain_url: "{{ blockchain[ task.name.split('_')[0] ] }}"
+      blockchain_name: "{{ task.name.split('_')[0] }}"
       blocks_per_file: 10000
       max_workers: 10
       is_archive: false
