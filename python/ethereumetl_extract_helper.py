@@ -150,6 +150,17 @@ def extract_table(table_name, blockchain_uri, max_workers, file_name, logger):
             f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}"
         ]
 
+    # Only available from an archive node, has block_number which the regular extract does not
+    elif table_name == "archive_contracts":
+        base_subprocess = base_subprocess[:4]
+        base_subprocess[1] = "extract_contracts"
+        additional_parts = [
+            "--traces",
+            f"data_downloads/geth_traces/{file_name}",
+            "--output",
+            f"data_downloads/contracts/{file_name}"
+        ]
+
     # Run the command with additional parts
     base_subprocess.extend(additional_parts)
     subprocess.run(base_subprocess)

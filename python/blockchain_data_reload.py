@@ -105,13 +105,30 @@ class LoadData(PythonTask):
                 remove(f"data_downloads/logs/{file_name}")
                 remove(f"data_downloads/token_transfers/{file_name}")
 
-                # Create contract addresses file, put receipts into snowflake + remove from local memory
-                create_requisite_files("contract_addresses", file_name, self.logger)
+                # If archive node is available, extract and put geth traces into snowflake
+                if is_archive:
+                    extract_table("geth_traces", blockchain_uri, max_workers, file_name, self.logger)
+                    create_requisite_files("geth_traces", file_name, self.logger)
+                    self.default_db.execute(create_put_query("geth_traces", schema, stage, current_directory, file_name, self.logger))
+
+                    # Extracts contracts from geth traces which will give us the block_number field in contracts table
+                    extract_table("archive_contracts", blockchain_uri, max_workers, file_name, self.logger)
+
+                    # Remove geth traces from local memory
+                    remove(f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}")
+                    remove(f"data_downloads/geth_traces/{file_name}")
+
+                else:
+                    # Creates requisite files for contracts when not using an archive node
+                    create_requisite_files("contract_addresses", file_name, self.logger)
+                    extract_table("contracts", blockchain_uri, max_workers, file_name, self.logger)
+                    remove("data_downloads/contract_addresses.txt")
+
+                # Put receipts into snowflake + remove from local memory
                 self.default_db.execute(create_put_query("receipts", schema, stage, current_directory, file_name, self.logger))
                 remove(f"data_downloads/receipts/{file_name}")
 
-                # Extract contracts, token_addresses and tokens
-                extract_table("contracts", blockchain_uri, max_workers, file_name, self.logger)
+                # Extract token_addresses and tokens
                 create_requisite_files("token_addresses", file_name, self.logger)
                 extract_table("tokens", blockchain_uri, max_workers, file_name, self.logger)
 
@@ -121,17 +138,8 @@ class LoadData(PythonTask):
                 remove(f"data_downloads/contracts/{file_name}")
                 remove(f"data_downloads/tokens/{file_name}")
 
-                # If archive node is available, extract and put geth traces into snowflake + remove files from local memory
-                if is_archive:
-                    extract_table("geth_traces", blockchain_uri, max_workers, file_name, self.logger)
-                    create_requisite_files("geth_traces", file_name, self.logger)
-                    self.default_db.execute(create_put_query("geth_traces", schema, stage, current_directory, file_name, self.logger))
-                    remove(f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}")
-                    remove(f"data_downloads/geth_traces/{file_name}")
-
                 # Clean up remaining requisite files
                 remove("data_downloads/filtered_contracts.csv")
-                remove("data_downloads/contract_addresses.txt")
                 remove("data_downloads/token_addresses.txt")
 
                 start_block += blocks_per_file
