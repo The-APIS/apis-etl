@@ -21,7 +21,7 @@ volumes: [
     def etlethImageName = "apis-etl-eth"
     
     def etlbscImage = "${env.DOCKER_REGISTRY}/${etlbscImageName}"
-    def etlethImage = "${env.DOCKER_REGISTRY}/${etlethImageName}
+    def etlethImage = "${env.DOCKER_REGISTRY}/${etlethImageName}"
 
     container('docker') {
       stage('Build etlbsc') {
