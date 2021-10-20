@@ -1,28 +1,17 @@
 tasks:
 
   bsc_missing_data_load:
-    type: python
+    preset: chain_data_load
     class: blockchain_data_reload.LoadData
     parameters:
-      file_format: csv_unloading
-      stage: bsc_stage
-      blockchain: bsc
-      blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 500
-      max_workers: 10
     parents:
       - create_bsc_blocks
 
   bsc_incremental_load:
-    type: python
-    class: blockchain_data.LoadData
+    preset: chain_data_load
     parameters:
-      file_format: csv_unloading
-      stage: bsc_stage
-      blockchain: bsc
-      blockchain_url: "{{ blockchain['bsc'] }}"
       blocks_per_file: 1000
-      max_workers: 10
     parents:
       - bsc_missing_data_load
       - create_bsc_blocks
@@ -41,11 +30,11 @@ tasks:
 
   update_bsc_token_transfers:
     preset: copy_from_stage
+    parameters:
+      table: token_transfers
     parents:
       - bsc_incremental_load
       - create_bsc_token_transfers
-    parameters:
-      table: token_transfers
 
   update_bsc_logs:
     preset: copy_from_stage

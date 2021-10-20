@@ -1,0 +1,22 @@
+USE SCHEMA {{ schema }};
+
+CREATE TABLE IF NOT EXISTS {{ table }} (
+    block_number NUMBER(38,0)
+  , transaction_hash VARCHAR(16777216)
+  , transaction_index NUMBER(38,0)
+  , from_address VARCHAR(16777216)
+  , to_address VARCHAR(16777216)
+  , value VARCHAR(16777216)
+  , input VARCHAR(16777216)
+  , output VARCHAR(16777216)
+  , trace_type VARCHAR(16777216)
+  , call_type VARCHAR(16777216)
+  , reward_type VARCHAR(16777216)
+  , gas NUMBER(38,0)
+  , gas_used NUMBER(38,0)
+  , subtraces NUMBER(38,0)
+  , trace_address VARCHAR(16777216)
+  , error VARCHAR(16777216)
+  , status NUMBER(38,0)
+  , trace_id VARCHAR(16777216)
+)

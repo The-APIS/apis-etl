@@ -2,22 +2,9 @@ import subprocess
 import requests
 
 
-def get_end_block(blockchain_url):
-    # TODO we've switched to using connecting directly to the node,
-    #      however this probably wouldn't work with socket connection
-
-    # result = subprocess.run([ "geth"
-    #                         , "attach"
-    #                         , blockchain_url
-    #                         , "--exec"
-    #                         , ''"eth.blockNumber"''
-    #                         ]
-    #                         , capture_output=True
-    #                         , text=True)
-    # return(int(result.stdout.strip('\n')))
-
+def get_end_block(blockchain_jsonrpc):
     result = requests.post(
-        blockchain_url,
+        blockchain_jsonrpc,
         headers={"Content-Type": "application/json"},
         json={"jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": 0},
     )
@@ -62,6 +49,12 @@ def create_requisite_files(file_type, file_name, logger):
         extract_sk[5] = "data_downloads/token_addresses.txt"
         extract_sk[6], extract_sk[7] = "-f", "address"
 
+    elif file_type == "geth_traces":
+        extract_sk = extract_sk[:-2]
+        extract_sk[1] = "extract_geth_traces"
+        extract_sk[3] = f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}"
+        extract_sk[5] = f"data_downloads/geth_traces/{file_name}"
+
     processes_to_run.append(extract_sk)
 
     for process in processes_to_run:
@@ -77,9 +70,9 @@ def create_put_query(table_name, schema, stage, current_directory, file_name, lo
     """
 
 
-def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
-    if not blockchain_url.startswith("https://"):
-        blockchain_url = "file://" + blockchain_url
+def extract_table(table_name, blockchain_uri, max_workers, file_name, logger):
+    if not blockchain_uri.startswith("https://"):
+        blockchain_uri = "file://" + blockchain_uri
     logger.info(f"Exporting {table_name} for {file_name}")
     base_subprocess = [
         "ethereumetl",
@@ -87,7 +80,7 @@ def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
         "--max-workers",
         f"{max_workers}",
         "--provider-uri",
-        blockchain_url,
+        blockchain_uri,
     ]
     if table_name == "blocks_and_transactions":
         start_block, stop_block = (
@@ -140,6 +133,32 @@ def extract_table(table_name, blockchain_url, max_workers, file_name, logger):
             f"data_downloads/logs/{file_name}",
             "--output",
             f"data_downloads/token_transfers/{file_name}",
+        ]
+
+    elif table_name == "geth_traces":
+        start_block, stop_block = (
+            file_name.split("_")[2],
+            file_name.split("_")[3].strip(".csv"),
+        )
+        del base_subprocess[2:4]
+        additional_parts = [
+            "--start-block",
+            start_block,
+            "--end-block",
+            stop_block,
+            "--output",
+            f"data_downloads/geth_traces/{file_name.replace('.csv', '.json')}"
+        ]
+
+    # Only available from an archive node, has block_number which the regular extract does not
+    elif table_name == "archive_contracts":
+        base_subprocess = base_subprocess[:4]
+        base_subprocess[1] = "extract_contracts"
+        additional_parts = [
+            "--traces",
+            f"data_downloads/geth_traces/{file_name}",
+            "--output",
+            f"data_downloads/contracts/{file_name}"
         ]
 
     # Run the command with additional parts
