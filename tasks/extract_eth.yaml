@@ -1,28 +1,18 @@
 tasks:
 
   eth_missing_data_load:
-    type: python
+    preset: chain_data_load
     class: blockchain_data_reload.LoadData
     parameters:
-      file_format: csv_unloading
-      stage: eth_stage
-      blockchain: eth
-      blockchain_url: "{{ blockchain['eth'] }}"
       blocks_per_file: 500
-      max_workers: 10
+      is_archive: true
     parents:
       - create_eth_blocks
 
   eth_incremental_load:
-    type: python
-    class: blockchain_data.LoadData
+    preset: chain_data_load
     parameters:
-      file_format: csv_unloading
-      stage: eth_stage
-      blockchain: eth
-      blockchain_url: "{{ blockchain['eth'] }}"
-      blocks_per_file: 10000
-      max_workers: 10
+      is_archive: true
     parents:
       - eth_missing_data_load
       - create_eth_blocks
@@ -41,11 +31,11 @@ tasks:
 
   update_eth_token_transfers:
     preset: copy_from_stage
+    parameters:
+      table: token_transfers
     parents:
       - eth_incremental_load
       - create_eth_token_transfers
-    parameters:
-      table: token_transfers
 
   update_eth_logs:
     preset: copy_from_stage
@@ -70,3 +60,11 @@ tasks:
     parents:
       - eth_incremental_load
       - create_eth_tokens
+
+  update_eth_geth_traces:
+    preset: copy_from_stage
+    parameters:
+      table: geth_traces
+    parents:
+      - eth_incremental_load
+      - create_eth_geth_traces
