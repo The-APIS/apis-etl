@@ -3,15 +3,14 @@
 WITH nft AS (
      SELECT *
        FROM {{ dynamic_src("logs.bsc_token_transfers") }}
-      WHERE TOKEN_ADDRESS = '0xe6965b4f189dbdb2bd65e60abaeb531b6fe9580b'
+      INNER JOIN {{ dynamic_src("staging.stg_nft_sale_nft_tokens") }}
     ),
 
 payment AS (
      SELECT *
        FROM {{ dynamic_src("logs.bsc_token_transfers") }}
-      WHERE TOKEN_ADDRESS = '0x6b23c89196deb721e6fd9726e6c76e4810a464bc'
-				-- Add token addresses here for more payment methods
-      )
+      INNER JOIN {{ dynamic_src("staging.stg_nft_sale_payment_tokens") }}
+    )
 
 SELECT p.from_address AS buyer_address
      , n.from_address AS seller_address

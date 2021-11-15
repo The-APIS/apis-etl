@@ -110,3 +110,13 @@ presets:
       schema: "{{ schema['logs'] }}"
       currency: "{{ task.name.split('_')[1] }}"
       table: "{{ task.name.split('_')[-1] }}"
+
+  # For hard-coded address tables, like stg_internal_xwg_addresses
+  address_table:
+    type: autosql
+    materialisation: table
+    file_name: "xwg/address_table.sql"
+    destination:
+      tmp_schema: "{{ schema['staging'] }}"
+      schema: "{{ schema['staging'] }}"
+      table: "{{ user_prefix }}{{ task.name }}"
