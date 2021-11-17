@@ -1,5 +1,5 @@
 sayn==0.5.10
-git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereumetl
+git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereum-etl
 
 # DB Connectors
 psycopg2-binary==2.8.6

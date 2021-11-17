@@ -20,7 +20,7 @@ WITH tokens AS (
        , b."TIMESTAMP" AS block_timestamp
        , TRY_CAST(c."VALUE" AS DOUBLE) AS value_double
     FROM {{ dynamic_src("logs.bsc_token_transfers") }} c
-    JOIN {{ dynamic_src("logc.bsc_blocks") }} b
+    JOIN {{ dynamic_src("logs.bsc_blocks") }} b
       ON c.BLOCK_NUMBER = b."NUMBER"
    INNER JOIN tokens t
       ON t.address = c.token_address
@@ -44,7 +44,7 @@ WITH tokens AS (
   GROUP BY 1,2,3
 )
 
-, b AS (
+, bals AS (
 	 SELECT token_address
 	      , holder_address
 	      , dt
@@ -67,21 +67,28 @@ WITH tokens AS (
 	 FROM transfer_in
 )
 
+, balances_without_aggregates AS (
+	SELECT DISTINCT token_address
+       , b.dt
+       , b.holder_address
+       , SUM("VALUE") OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt ASC) AS rolling_balance
+    FROM bals b
+)
+
 , internal_xwg_addresses AS (
 	SELECT address AS holder_address
        , 1 as is_xwg_address
-    FROM {{ dynamic_src("staging.stg_internal_xwg_addresses") }}
+    FROM {{ dynamic_src("staging.stg_xwg_addresses_to_exclude")}}
 )
 
-
-SELECT DISTINCT token_address
+SELECT b.token_address
      , b.holder_address
      , b.dt
      , LEAD(b.dt, 1, CURRENT_DATE) OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt ASC) AS next_dt
      , ROW_NUMBER() OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt DESC) dt_rank
-     , SUM("VALUE") OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt ASC) AS rolling_balance
+     , b.rolling_balance
      , TRY_CAST(rolling_balance AS DOUBLE) * POWER(10 * 1.000, -18) AS rolling_balance_xwg
      , CASE WHEN i.is_xwg_address IS NULL THEN 0 ELSE 1 END AS is_xwg_address
-  FROM b
+  FROM balances_without_aggregates b
   LEFT JOIN internal_xwg_addresses i
-    ON b.holder_address = i.holder_address;
+  ON b.holder_address = i.holder_address;
