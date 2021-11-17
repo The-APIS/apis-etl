@@ -8,4 +8,4 @@ SELECT d.dt
     ON b.dt < d.dt AND d.dt <= b.next_dt
  WHERE rolling_balance > 0
  GROUP BY d.dt, b.token_address
- ORDER BY dt DESC;
+ ORDER BY dt DESC

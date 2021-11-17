@@ -1,17 +1,17 @@
 {%- from 'sql/macros/dynamic_source.sql' import dynamic_src  -%}
 
 WITH nft AS (
-     SELECT *
-       FROM {{ dynamic_src("logs.bsc_token_transfers") }} t
-      INNER JOIN {{ dynamic_src("staging.stg_nft_sale_nft_tokens") }} n
-         ON t.token_address = n.address
+  SELECT *
+    FROM {{ dynamic_src("logs.bsc_token_transfers") }} t
+   INNER JOIN {{ dynamic_src("staging.stg_nft_sale_nft_tokens") }} n
+      ON t.token_address = n.address
     ),
 
 payment AS (
-     SELECT *
-       FROM {{ dynamic_src("logs.bsc_token_transfers") }} t
-      INNER JOIN {{ dynamic_src("staging.stg_nft_sale_payment_tokens") }} n
-         ON t.token_address = n.address
+  SELECT *
+   FROM {{ dynamic_src("logs.bsc_token_transfers") }} t
+  INNER JOIN {{ dynamic_src("staging.stg_nft_sale_payment_tokens") }} n
+     ON t.token_address = n.address
     )
 
 SELECT p.from_address AS buyer_address
@@ -27,4 +27,4 @@ SELECT p.from_address AS buyer_address
   JOIN payment p
     ON n.transaction_hash = p.transaction_hash
   JOIN {{ dynamic_src("logs.bsc_blocks") }} b
-    ON p.BLOCK_NUMBER = b."NUMBER";
+    ON p.BLOCK_NUMBER = b."NUMBER"

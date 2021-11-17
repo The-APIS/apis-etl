@@ -18,8 +18,6 @@ parameters:
     eth: 'https://mainnet.ethereum.nodes-mainnet.theapis.io'
 
   from_prod:
-  - "logs.bsc_token_transfers"
-  - "logs.bsc_blocks"
 
 required_credentials:
   - warehouse

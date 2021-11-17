@@ -13,4 +13,4 @@ SELECT d.dt
  WHERE rolling_balance > 0
    AND is_xwg_address = 0
 
- GROUP BY 1, 2;
+ GROUP BY 1, 2

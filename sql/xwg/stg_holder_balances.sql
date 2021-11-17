@@ -19,6 +19,7 @@ WITH tokens AS (
        , c.to_address
        , b."TIMESTAMP" AS block_timestamp
        , TRY_CAST(c."VALUE" AS DOUBLE) AS value_double
+       , t.is_erc721
     FROM {{ dynamic_src("logs.bsc_token_transfers") }} c
     JOIN {{ dynamic_src("logs.bsc_blocks") }} b
       ON c.BLOCK_NUMBER = b."NUMBER"
@@ -87,8 +88,8 @@ SELECT b.token_address
      , LEAD(b.dt, 1, CURRENT_DATE) OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt ASC) AS next_dt
      , ROW_NUMBER() OVER (PARTITION BY b.token_address, b.holder_address ORDER BY b.dt DESC) dt_rank
      , b.rolling_balance
-     , TRY_CAST(rolling_balance AS DOUBLE) * POWER(10 * 1.000, -18) AS rolling_balance_xwg
+     , TRY_CAST(b.rolling_balance AS DOUBLE) * POWER(10 * 1.000, -18) AS rolling_balance_xwg
      , CASE WHEN i.is_xwg_address IS NULL THEN 0 ELSE 1 END AS is_xwg_address
   FROM balances_without_aggregates b
   LEFT JOIN internal_xwg_addresses i
-  ON b.holder_address = i.holder_address;
+  ON b.holder_address = i.holder_address
