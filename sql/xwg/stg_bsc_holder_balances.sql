@@ -3,13 +3,13 @@
 WITH tokens AS (
   SELECT address
        , 0 AS is_erc721
-  FROM {{ dynamic_src("staging.stg_holders_erc20_tokens") }}
+  FROM {{ dynamic_src("staging.stg_bsc_holders_erc20_tokens") }}
 
   UNION ALL
 
   SELECT address
        , 1 AS is_erc721
-  FROM {{ dynamic_src("staging.stg_holders_erc721_tokens") }}
+  FROM {{ dynamic_src("staging.stg_bsc_holders_erc721_tokens") }}
 
 )
 
@@ -79,7 +79,7 @@ WITH tokens AS (
 , internal_xwg_addresses AS (
 	SELECT address AS holder_address
        , 1 as is_xwg_address
-    FROM {{ dynamic_src("staging.stg_xwg_addresses_to_exclude")}}
+    FROM {{ dynamic_src("staging.stg_bsc_xwg_addresses_to_exclude")}}
 )
 
 SELECT b.token_address

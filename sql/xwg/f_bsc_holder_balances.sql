@@ -9,6 +9,6 @@ SELECT h.token_address
      , h.next_dt
      , h.dt_rank
      , h.is_xwg_address
-  FROM {{ dynamic_src("staging.stg_holder_balances") }} h
-  JOIN {{ dynamic_src("models.f_circulating_supply") }} s
+  FROM {{ dynamic_src("staging.stg_bsc_holder_balances") }} h
+  JOIN {{ dynamic_src("models.f_bsc_circulating_supply") }} s
     ON h.next_dt = s.dt AND h.token_address = s.token_address

@@ -3,13 +3,13 @@
 WITH active_traders AS (
 	SELECT to_date("TIMESTAMP") AS dt
 	     , buyer_address AS trader_address
-	  FROM {{ dynamic_src("models.f_nft_sales") }}
+	  FROM {{ dynamic_src("models.f_bsc_nft_sales") }}
 
 	UNION ALL
 
 	SELECT to_date("TIMESTAMP") AS dt
 	     , seller_address AS trader_address
-	  FROM {{ dynamic_src("models.f_nft_sales") }}
+	  FROM {{ dynamic_src("models.f_bsc_nft_sales") }}
 )
 
 SELECT dt

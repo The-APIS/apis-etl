@@ -110,3 +110,12 @@ presets:
       schema: "{{ schema['logs'] }}"
       currency: "{{ task.name.split('_')[1] }}"
       table: "{{ task.name.split('_')[-1] }}"
+
+  data_dump:
+    type: python
+    class: get_data.GetData
+    parameters:
+      stage: data_unload
+      schema: analytics_models
+      table: "{{ '_'.join(task.name.split('_')[1:]) }}"
+      path: "{{ '/data_downloads/' + '_'.join(task.name.split('_')[1:]) }}"

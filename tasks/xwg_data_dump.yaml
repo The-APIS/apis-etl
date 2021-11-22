@@ -1,0 +1,10 @@
+tasks:
+  dump_f_bsc_circulating_supply:
+    preset: data_dump
+    parameters:
+      file_format: json_unloading
+      json_table_columns:
+        - dt
+        - token_address
+        - circulating_supply
+        - circulating_supply_xwg
