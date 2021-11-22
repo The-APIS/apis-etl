@@ -3,8 +3,23 @@ tasks:
     preset: data_dump
     parameters:
       file_format: json_unloading
-      json_table_columns:
-        - dt
-        - token_address
-        - circulating_supply
-        - circulating_supply_xwg
+
+  dump_f_bsc_daily_active_traders:
+    preset: data_dump
+    parameters:
+      file_format: json_unloading
+
+  dump_f_bsc_daily_holders_count:
+    preset: data_dump
+    parameters:
+      file_format: json_unloading
+
+  dump_f_bsc_holder_balances:
+    preset: data_dump
+    parameters:
+      file_format: json_unloading
+
+  dump_f_bsc_nft_sales:
+    preset: data_dump
+    parameters:
+      file_format: json_unloading

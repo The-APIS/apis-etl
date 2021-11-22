@@ -13,13 +13,14 @@ class GetData(PythonTask):
         stage = self.parameters["stage"]
         schema = self.parameters["schema"]
         table = self.parameters["table"]
-        columns = self.parameters["json_table_columns"]
         full_path = getcwd() + self.parameters["path"]
 
         if path.isdir(full_path):
             pass
         else:
             makedirs(full_path)
+
+        # File type options for snowflake data unload (see CREATE FILE FORMAT docs)
 
         file_type_options = {}
 
@@ -38,10 +39,22 @@ class GetData(PythonTask):
         }
 
         if file_format not in file_type_options.keys():
-            return self.fail("Incorrect file format name")
+            return self.fail("Unknown file format name")
 
-        if file_format == "json_unloading" and columns == None:
-            return self.fail("Column specification required for json unloading")
+        # JSON dump needs specific column name specification
+        json_columns_query = f'''
+
+            SELECT *
+              FROM {schema}.{table}
+             LIMIT 1;
+
+        '''
+
+        if file_format == "json_unloading":
+            column_results = self.default_db.read_data(json_columns_query)
+            if len(column_results) == 0:
+                return self.fail(f"Table {table} is empty.")
+            columns = list(column_results[0].keys())
 
         sql_query = f'''
 
