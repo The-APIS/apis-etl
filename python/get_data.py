@@ -14,6 +14,7 @@ class GetData(PythonTask):
         schema = self.parameters["schema"]
         table = self.parameters["table"]
         full_path = getcwd() + self.parameters["path"]
+        single_file = bool(self.parameters["single_file"])
 
         if path.isdir(full_path):
             pass
@@ -76,7 +77,9 @@ class GetData(PythonTask):
         '''
 
         if file_format == "csv_unloading":
-            sql_query += f"from {table};\n"
+            sql_query += f'''
+                from {table}
+            '''
 
         # In the case of json unload, we need an object constructor
         elif file_format == "json_unloading":
@@ -85,10 +88,18 @@ class GetData(PythonTask):
                 sql_query += f"'{column}',{column},"
             sql_query = sql_query[:-1] + f'''
                 ) from {table})
-                file_format = {file_format};
+                file_format = {file_format}
                 '''
 
+        if single_file:
+            sql_query += '''
+                single = true
+                max_file_size = 5368709120
+            '''
+
         sql_query += f'''
+        ;
+
         GET @{stage}/{table}/ file://{full_path};
 
         DROP STAGE {stage};

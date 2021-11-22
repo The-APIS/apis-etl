@@ -119,3 +119,4 @@ presets:
       schema: analytics_models
       table: "{{ '_'.join(task.name.split('_')[1:]) }}"
       path: "{{ '/data_downloads/' + '_'.join(task.name.split('_')[1:]) }}"
+      single_file: false
