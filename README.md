@@ -1,18 +1,55 @@
 # Quick Start
 
-## Scheduling BSC Incremental Load Into Snowflake via Docker Container
+## BSC Incremental Load (via Docker container)
+
+These steps will achieve the following:
+
+* Extract and load the latest BSC blocks so that the snowflake tables are up to date.
+* Update the analysis tables using this new data.
+* Unload the analysis tables into a given location in JSON format.
+
+To build and execute this task as a docker container:
 
 1. Clone the repository and change directory to the cloned repo
-2. Run 
+2. Run
 ```
 docker build . -f Dockerfile_bsc -t incremental_bsc_load
 ```
-3. Run 
+3. Run
 ```
-docker run \ 
-  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
-  incremental_bsc_load \ 
-  sayn run -t group:create_bsc_tables -t group:extract_bsc -d
+docker run \
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  incremental_bsc_load \
+  scripts/daily_bsc.sh
+```
+
+Note: For a single test run, command in part 3 should be changed to this. To optionally define the start and end blocks, refer to the `test_value` parameter, covered in [Additional information](##-test-values-parameter-(optional))
+
+```
+docker run \
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -e SAYN_PARAMETER_is_test='true' \
+  -e SAYN_PARAMETER_user_prefix=your_initials_ \
+  # Optional: -e SAYN_PARAMETER_test_values='{"start_block":start, "end_block":end}' \
+  -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' \
+  incremental_bsc_load \
+  sayn run -t group:create_bsc_tables -t group:extract_bsc -t stg_dates -t group:xwg -t group:xwg_data_dump
+```
+
+## Scheduling Ethereum Incremental Load Into Snowflake via Docker Container
+
+1. Clone the repository and change directory to the cloned repo
+2. Run
+```
+docker build . -f Dockerfile_eth -t incremental_eth_load
+```
+3. Run
+```
+docker run \
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -e SAYN_PARAMETER_blockchain='your_node_locations' \
+  incremental_eth_load \
+  sayn run -t group:create_eth_tables -t group:extract_eth -d
 ```
 
 Note: For a quick single test run, command in part 3 should be change to this
@@ -20,57 +57,42 @@ Note: For a quick single test run, command in part 3 should be change to this
 ```
 docker run \
   -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -e SAYN_PARAMETER_blockchain='your_node_locations' \
   -e SAYN_PARAMETER_is_test='true' \
-  -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' \ 
-  incremental_bsc_load \
-  sayn run -t group:create_bsc_tables -t group:extract_bsc -d
-```
-
-## Scheduling Ethereum Incremental Load Into Snowflake via Docker Container
-
-1. Clone the repository and change directory to the cloned repo
-2. Run 
-```
-docker build . -f Dockerfile_eth -t incremental_eth_load
-```
-3. Run 
-```
-docker run \
-  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
-  -e SAYN_PARAMETER_blockchain='your_node_locations' \ 
-  incremental_eth_load \ 
+  -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' \
+  incremental_eth_load \
   sayn run -t group:create_eth_tables -t group:extract_eth -d
 ```
 
-Note: For a quick single test run, command in part 3 should be change to this
+## Data unload (via Docker container)
 
-```
-docker run \ 
-  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
-  -e SAYN_PARAMETER_blockchain='your_node_locations' \ 
-  -e SAYN_PARAMETER_is_test='true' \
-  -e SAYN_PARAMETER_schema='{"logs":"test_logs", "staging":"test_staging", "models":"test_models", "viz":"test_viz"}' \ 
-  incremental_eth_load \ 
-  sayn run -t group:create_eth_tables -t group:extract_eth -d
-```
-
-## Retrieving Snowflake Data via Docker Container
+For generic blockchain data, do the following:
 
 1. Clone the repository and change directory to the cloned repo
-2. Run 
+2. Run
 ```
 docker build . -t get_snowflake_data
 ```
-3. Run 
-``` 
+3. Run
+```
 docker run \
-  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \ 
-  -v path_to_save_to:/app/data_downloads \ 
-  get_snowflake_data \ 
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -v path_to_save_to:/app/data_downloads \
+  get_snowflake_data \
   sayn run -t group:data_dump
 ```
 
-### Variable Explanation
+For the XWG analysis data, the following should replace 3:
+```
+docker run \
+  -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -v path_to_save_to:/app/data_downloads \
+  get_snowflake_data \
+  sayn run -t group:xwg_data_dump
+
+```
+
+### Data unload variable Explanation
 
 `path_to_save_to` = local path to save the tables to
 
@@ -78,7 +100,12 @@ docker run \
 
 `your_node_locations` = this should be changed to a list of your node locations in JSON format
 
-#### Credentials Structure
+## Additional information
+
+### Credentials Structure
+
+Wherever `'your_snowflake_credentials'` is mentioned, it will expect a JSON object like this:
+
 ```
 {
   "type": "snowflake",
@@ -91,7 +118,7 @@ docker run \
 }
 ```
 
-#### Blockchain Node Locations Structure
+## Blockchain Node Locations Structure
 ```
 {
   "bsc": "https://bsc-dataseed.binance.org"
@@ -101,7 +128,7 @@ docker run \
 
 When using a local node, the values above is expected to be a standard unix path (eg: `/var/ipc/ethereum.ipc`).
 
-#### Test Values Parameter (Optional)
+## Test Values Parameter (Optional)
 
 Structure:
 
