@@ -19,9 +19,12 @@ docker build . -f Dockerfile_bsc -t incremental_bsc_load
 ```
 docker run \
   -e SAYN_CREDENTIAL_warehouse='your_snowflake_credentials' \
+  -v path_to_save_to:/app/data_downloads \
   incremental_bsc_load \
   scripts/daily_bsc.sh
 ```
+
+`path_to_save_to` should be replaced by an **absolute** path to the desired data download location.
 
 Note: For a single test run, command in part 3 should be changed to this. To optionally define the start and end blocks, refer to the `test_value` parameter, covered in [Additional information](#testvalues)
 
