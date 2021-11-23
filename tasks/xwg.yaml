@@ -74,17 +74,16 @@ tasks:
       - stg_bsc_holders_erc20_tokens
       - stg_bsc_holders_erc721_tokens
       - stg_bsc_xwg_addresses_to_exclude
+      - update_bsc_token_transfers
+      - update_bsc_blocks
 
   f_bsc_nft_sales:
     preset: models
     parents:
       - stg_bsc_nft_sale_nft_tokens
       - stg_bsc_nft_sale_payment_tokens
-
-  mb_f_bsc_nft_sales:
-    preset: metabase
-    parents:
-      - f_bsc_nft_sales
+      - update_bsc_token_transfers
+      - update_bsc_blocks
 
   f_bsc_circulating_supply:
     preset: models
@@ -92,21 +91,11 @@ tasks:
       - stg_bsc_holder_balances
       - stg_dates
 
-  mb_f_bsc_circulating_supply:
-    preset: metabase
-    parents:
-      - f_bsc_circulating_supply
-
   f_bsc_holder_balances:
     preset: models
     parents:
       - stg_bsc_holder_balances
       - f_bsc_circulating_supply
-
-  mb_f_bsc_holder_balances:
-    preset: metabase
-    parents:
-      - f_bsc_holder_balances
 
   f_bsc_daily_holders_count:
     preset: models
@@ -114,17 +103,7 @@ tasks:
       - f_bsc_holder_balances
       - stg_dates
 
-  mb_f_bsc_daily_holders_count:
-    preset: metabase
-    parents:
-      - f_bsc_daily_holders_count
-
   f_bsc_daily_active_traders:
     preset: models
     parents:
       - f_bsc_nft_sales
-
-  mb_f_bsc_daily_active_traders:
-    preset: metabase
-    parents:
-      - f_bsc_daily_active_traders

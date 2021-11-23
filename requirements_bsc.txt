@@ -1,8 +1,8 @@
-sayn==0.5.10
-git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereum-etl
-
 # DB Connectors
 psycopg2-binary==2.8.6
 snowflake-connector-python==2.4.3
 snowflake-sqlalchemy==1.2.4
 requests==2.26.0
+
+sayn==0.5.10
+git+git://github.com/TimofeySugaipov/ethereum-etl.git#egg=ethereum-etl

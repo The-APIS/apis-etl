@@ -1,0 +1,25 @@
+tasks:
+  mb_f_bsc_nft_sales:
+    preset: metabase
+    parents:
+      - f_bsc_nft_sales
+
+  mb_f_bsc_circulating_supply:
+    preset: metabase
+    parents:
+      - f_bsc_circulating_supply
+
+  mb_f_bsc_holder_balances:
+    preset: metabase
+    parents:
+      - f_bsc_holder_balances
+
+  mb_f_bsc_daily_holders_count:
+    preset: metabase
+    parents:
+      - f_bsc_daily_holders_count
+      
+  mb_f_bsc_daily_active_traders:
+    preset: metabase
+    parents:
+      - f_bsc_daily_active_traders

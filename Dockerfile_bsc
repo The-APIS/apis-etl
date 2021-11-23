@@ -14,8 +14,12 @@ RUN apt-get -y install python3.8
 
 RUN apt-get -y install python3-pip
 
+RUN apt-get -y install libpq-dev
+
+RUN apt-get -y install gcc
+
 WORKDIR /app
 
 COPY . .
 
-RUN pip install -r requirements_bsc.txt
+RUN pip install -r requirements_bsc.txt --no-use-pep517

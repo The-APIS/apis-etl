@@ -1,25 +1,35 @@
 tasks:
   dump_f_bsc_circulating_supply:
     preset: data_dump
+    parents:
+      - f_bsc_circulating_supply
     parameters:
       file_format: json_unloading
 
   dump_f_bsc_daily_active_traders:
     preset: data_dump
+    parents:
+      - f_bsc_daily_active_traders
     parameters:
       file_format: json_unloading
 
   dump_f_bsc_daily_holders_count:
     preset: data_dump
+    parents:
+      - f_bsc_daily_holders_count
     parameters:
       file_format: json_unloading
 
   dump_f_bsc_holder_balances:
     preset: data_dump
+    parents:
+      - f_bsc_holder_balances
     parameters:
       file_format: json_unloading
 
   dump_f_bsc_nft_sales:
     preset: data_dump
+    parents:
+      - f_bsc_nft_sales
     parameters:
       file_format: json_unloading
