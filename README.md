@@ -23,7 +23,7 @@ docker run \
   scripts/daily_bsc.sh
 ```
 
-Note: For a single test run, command in part 3 should be changed to this. To optionally define the start and end blocks, refer to the `test_value` parameter, covered in [Additional information](##-test-values-parameter-(optional))
+Note: For a single test run, command in part 3 should be changed to this. To optionally define the start and end blocks, refer to the `test_value` parameter, covered in [Additional information](#testvalues)
 
 ```
 docker run \
@@ -128,6 +128,7 @@ Wherever `'your_snowflake_credentials'` is mentioned, it will expect a JSON obje
 
 When using a local node, the values above is expected to be a standard unix path (eg: `/var/ipc/ethereum.ipc`).
 
+<a name="testvalues">
 ## Test Values Parameter (Optional)
 
 Structure:
@@ -144,6 +145,7 @@ Note: start_block and end_block are integers not strings
 This parameter can be modified to change start and end blocks of a test (not specifying this parameter will result in a default test)
 
 You can add this parameter after the `docker run` command, e.g. `docker run -e SAYN_PARAMETER_test_values='your_test_values'...`
+</a>
 
 ## Running Locally
 
