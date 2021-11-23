@@ -106,7 +106,7 @@ class GetData(PythonTask):
 
         '''
 
-        self.debug(sql_query)
+        # self.debug(sql_query)
         self.default_db.execute(sql_query)
 
         return self.success()
