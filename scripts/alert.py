@@ -2,13 +2,28 @@
 
 from datetime import date
 from itertools import zip_longest
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+from io import StringIO
+import json
 import os
-
 import requests
+import validators
 
-webhook_urls = ["https://hooks.slack.com/services/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"]
+web_api_creds = []
+webhook_urls = []
+for name,value in os.environ.items():
+    if name.startswith('SAYN_ALERT_'):
+        if validators.url(value):
+            webhook_urls.append(value)
+        else:
+            try:
+                web_api_creds.append(json.loads(value))
+            except ValueError as e:
+                print(f"Parameter {name} is neither a valid URL nor a valid JSON object.")
 
 log_filename = "logs/sayn.log"
+message_summary_keys = ["run_id", "timestamp", "level", "message"]
 
 
 def reverse_readline(filename, buf_size=8192):
@@ -44,38 +59,48 @@ def reverse_readline(filename, buf_size=8192):
             yield segment
 
 
-def get_last_execution(log_filename):
-    """Gets the summary of the last log"""
+# Get a list of the lines of the latest log
+def get_latest_log(log_filename, message_summary_keys):
+    log = []
+    for line in reverse_readline(log_filename):
+        log.append(line)
+        if "Starting sayn" in line:
+            break
+    return list(reversed(log))
+
+# Retrieve a list of dicts denoting the data on each line of the log
+def get_log_summary(log, message_summary_keys):
     lines = []
     run_id = None
-    for line in reverse_readline(log_filename):
-        if run_id is None:
-            run_id = line.split("|")[0]
-
-        if run_id != line.split("|")[0]:
-            break
-        else:
-            dline = dict(
-                zip_longest(
-                    ("run_id", "timestamp", "level", "message"), line.split("|")
-                )
+    for line in log:
+        # Any extra indices are parts of the message with a | in it, so add them to the message.
+        line_list = (line.split("|")[:len(message_summary_keys) - 1]
+                     + ["|".join(line.split("|")[len(message_summary_keys) - 1:])])
+        dline = dict(
+            zip_longest(
+                message_summary_keys, line_list
             )
-            if None in dline:
-                # None not in dline is to stop at older versions of sayn
-                break
+        )
 
-            run_id = dline["run_id"]
+        run_id = dline["run_id"]
+
+        # Where a date conversion fails, this is likely not a message we need
+        # a summary for anyway
+        try:
             dline["date"] = date(*map(int, dline["timestamp"].split(" ")[0].split("-")))
+        except ValueError:
+            dline["message"] = None
 
-            if dline["message"] is not None:
-                lines.append(dline)
+        if dline["message"] is not None:
+            lines.append(dline)
 
-    return list(reversed(lines))
+    return lines
 
 
-def get_alert_message(lines):
+def get_alert_message(lines, logs):
     poke = False
     out_message = list()
+    etl_failed = False
 
     if "Execution of SAYN took" not in lines[-1]["message"]:
         poke = True
@@ -91,6 +116,7 @@ def get_alert_message(lines):
 
     else:
         poke = True
+        etl_failed = True
         out_message.append("ETL failed today!!!!!")
         for line in lines[-3:-1]:
             if "Failed" in line["message"] or "Skipped" in line["message"]:
@@ -101,20 +127,51 @@ def get_alert_message(lines):
     else:
         out_message[0] = f":green_heart: {out_message[0]}"
 
-    return "\n".join(out_message)
+    # logs and out_message are a list of lines here
+    return {
+        "message": "\n".join(out_message),
+        "etl_failed": etl_failed,
+        "logs": "\n".join(logs)
+    }
 
-
-def send_message(webook_urls, message):
+def send_message_slack_web_api(web_api_creds, alert):
     """Sends message to Slack channel"""
+    for web_api_cred in web_api_creds:
+        slack_client = WebClient(token=web_api_cred["token"])
+        for channel in web_api_cred["channels"]:
+            try:
+                response = slack_client.chat_postMessage(
+                    channel = channel,
+                    text = alert["message"]
+                )
+                if alert["etl_failed"]:
+                    slack_client.files_upload(
+                        content = alert["logs"],
+                        channels = channel,
+                        filename = "run_logs",
+                        title = "Run Logs"
+                    )
+            except SlackApiError as e:
+                print(e)
+
+
+def send_message_webhooks(webhook_urls, alert):
     for webhook_url in webhook_urls:
         requests.post(
             webhook_url,
-            headers={"Content-type": "application/json"},
-            json={"text": message},
+            headers = {"Content-type": "application/json"},
+            json = {"text": alert["message"]}
         )
 
 
 if __name__ == "__main__":
-    lines = get_last_execution(log_filename)
-    message = get_alert_message(lines)
-    send_message(webhook_urls, message)
+
+    latest_log = get_latest_log(log_filename, message_summary_keys)
+
+    summary = get_log_summary(latest_log, message_summary_keys)
+
+    alert = get_alert_message(summary, latest_log)
+
+    send_message_slack_web_api(web_api_creds, alert)
+
+    send_message_webhooks(webhook_urls, alert)
